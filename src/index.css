@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🔥 GLOBAL DESIGN SYSTEM */
+
+body {
+  @apply bg-gray-50 text-gray-900;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+/* Smooth UI */
+* {
+  transition: all 0.15s ease-in-out;
+}
+
+/* Scrollbar (enterprise look) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5f5;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
