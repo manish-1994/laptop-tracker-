@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import RecordManager from "./pages/RecordManager";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Sheets from "./pages/Sheets";
@@ -39,6 +39,10 @@ export default function App() {
 
   {/* SHEETS */}
   <Route path="/sheets" element={<Sheets />} />
+
+  {(user.role === "admin" || user.role === "super_admin") && (
+  <Route path="/records" element={<RecordManager />} />
+)}
 
   {/* 🔒 ROLE BASED */}
  // 🔒 ONLY SUPER ADMIN CAN ACCESS ADMIN PANEL

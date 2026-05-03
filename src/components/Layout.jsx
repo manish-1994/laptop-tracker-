@@ -29,15 +29,22 @@ export default function Layout({ children, setUser }) {
             Sheets
           </Link>
 
+          {/* 👇 ADD THIS EXACTLY HERE */}
+          {(user.role === "admin" || user.role === "super_admin") && (
+            <Link to="/records">Record Manager</Link>
+          )}
+
+
           {user.role === "super_admin" && (
-  <Link to="/admin">Admin Panel</Link>
-)}
+            <Link to="/admin">Admin Panel</Link>
+          )}
+
 
           {(user.role === "admin" || user.role === "super_admin") && (
-  <Link to="/logs">Logs</Link>
-)}
+            <Link to="/logs">Logs</Link>
+          )}
 
-
+          
         </nav>
 
         <button
