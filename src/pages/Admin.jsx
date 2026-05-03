@@ -208,19 +208,25 @@ const deleteUser = async (id) => {
       }
     );
 
-    const result = await res.json();
+    let result;
+    try {
+      result = await res.json();
+    } catch {
+      result = { error: "Invalid response from server" };
+    }
 
-    if (result.error) {
-      return alert("❌ " + result.error);
+    console.log("DELETE RESPONSE:", result);
+
+    if (!res.ok || result.error) {
+      return alert("❌ " + (result.error || "Delete failed"));
     }
 
     alert("✅ User deleted");
-
     loadUsers();
 
   } catch (err) {
     console.error(err);
-    alert("❌ Failed");
+    alert("❌ " + err.message);
   }
 };
 
