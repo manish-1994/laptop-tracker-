@@ -19,9 +19,28 @@ export default function Layout({ children, setUser }) {
       <div className="w-64 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-5 flex flex-col shadow-2xl">
 
         {/* LOGO */}
-        <h1 className="text-2xl font-bold mb-8 tracking-wide">
-          Asset OS
-        </h1>
+        <div className="mb-6">
+
+          <h1 className="text-xl font-bold">Asset OS</h1>
+
+          {/* USER INFO */}
+          <div className="mt-4 p-3 rounded-xl bg-white/10 backdrop-blur border border-white/10">
+
+            <div className="text-sm font-semibold text-white">
+              {user?.username || "User"}
+            </div>
+
+            <div className="text-xs text-indigo-300 capitalize">
+              {user?.role}
+            </div>
+
+            <div className="text-[10px] text-gray-400 mt-1">
+              {new Date().toLocaleString()}
+            </div>
+
+          </div>
+
+        </div>
 
         <nav className="flex flex-col gap-2">
 
