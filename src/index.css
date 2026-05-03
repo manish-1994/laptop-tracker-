@@ -5,8 +5,13 @@
 /* 🔥 GLOBAL DESIGN SYSTEM */
 
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 text-gray-800;
   font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+/* Card system */
+.card {
+  @apply bg-white/80 backdrop-blur-md border border-gray-200 shadow-xl rounded-2xl;
 }
 
 /* Smooth UI */
@@ -14,7 +19,7 @@ body {
   transition: all 0.15s ease-in-out;
 }
 
-/* Scrollbar (enterprise look) */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -26,4 +31,15 @@ body {
 
 ::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Inputs focus */
+input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+/* Button press effect */
+button:active {
+  transform: scale(0.97);
 }

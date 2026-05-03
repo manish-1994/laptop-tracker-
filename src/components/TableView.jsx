@@ -138,23 +138,21 @@ if (authData?.user) {
   );
 
   return (
-    <div className="bg-white rounded-2xl shadow border p-4">
-
+<div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-4">
       <input
         placeholder="🔍 Search..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 w-full px-4 py-2 border rounded"
-      />
+        className="mb-4 w-full px-4 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500"      />
 
       <div className="overflow-auto max-h-[70vh]">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm border-separate border-spacing-y-2">
 
           {/* HEADER */}
-          <thead className="bg-gray-100 sticky top-0">
+          <thead className="bg-white/80 backdrop-blur sticky top-0 border-b">
             <tr>
               {columns.map((col) => (
-                <th key={col.id} className="px-3 py-2 text-left text-xs font-semibold">
+                <th key={col.id} className="px-3 py-2 text-left text-xs font-semibold text-gray-700 tracking-tight">
 
                   {editHeader === col.id ? (
                     <input
@@ -177,7 +175,7 @@ if (authData?.user) {
                       onClick={() =>
                         canEditHeader && setEditHeader(col.id)
                       }
-                      className={canEditHeader ? "cursor-pointer" : ""}
+                      className={canEditHeader ? "cursor-pointer hover:text-indigo-600 transition" : ""}
                     >
                       {col.name}
                     </div>
@@ -191,7 +189,7 @@ if (authData?.user) {
           {/* BODY */}
           <tbody>
             {filtered.map((row) => (
-              <tr key={row.id} className="border-b">
+              <tr key={row.id} className="bg-white shadow-sm rounded-xl hover:shadow-md transition">
                 {columns.map((col) => {
                   const value = getValue(row, col.name);
                   const isEditing =
@@ -222,9 +220,11 @@ if (authData?.user) {
                             canEditCell &&
                             setEditCell(`${row.id}-${col.name}`)
                           }
-                          className={canEditCell ? "cursor-pointer" : ""}
+                          className={canEditCell ? "cursor-pointer hover:bg-gray-50 rounded px-1" : ""}
                         >
-                          {value || "-"}
+                          <span className={value ? "" : "text-gray-400 italic"}>
+  {value || "Empty"}
+</span>
                         </div>
                       )}
 
