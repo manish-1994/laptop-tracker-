@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../services/supabase";
 
-export default function TableView({ rows, columns, refresh, sheetId }) {
+export default function TableView({ rows, columns, refresh, sheetId, onColumnRename }) {
+    onColumnRename = onColumnRename || (() => {});
+
   const [search, setSearch] = useState("");
   const [editCell, setEditCell] = useState(null);
   const [editHeader, setEditHeader] = useState(null);
@@ -35,79 +37,47 @@ export default function TableView({ rows, columns, refresh, sheetId }) {
     (str || "").toString().trim().toLowerCase().replace(/^@/, "");
 
   // 🔥 SAFE VALUE FETCH
-  const getValue = (row, col) => {
-    const target = normalize(col);
+  // 🔥 SAFE VALUE FETCH
+const getValue = (row, col) => {
+  if (row.data?.hasOwnProperty(col)) {
+    return row.data[col];
+  }
 
-    const key = Object.keys(row.data || {}).find(
-      (k) => normalize(k) === target
-    );
+  const target = normalize(col);
 
-    return key ? row.data[key] : "";
-  };
+  const key = Object.keys(row.data || {}).find(
+    (k) => normalize(k) === target
+  );
+
+  return key ? row.data[key] : "";
+};
 
   // 🔥 CELL UPDATE
   const updateCell = async (row, col, value) => {
-    const realKey =
-      Object.keys(row.data || {}).find(
-        (k) => normalize(k) === normalize(col)
-      ) || col;
+  let realKey = col;
 
-    await supabase
-      .from("rows")
-      .update({
-        data: { ...row.data, [realKey]: value },
-      })
-      .eq("id", row.id);
+  if (!row.data?.hasOwnProperty(realKey)) {
+    const matchedKey = Object.keys(row.data || {}).find(
+      (k) => normalize(k) === normalize(col)
+    );
 
-    refresh();
-  };
+    if (matchedKey) {
+      realKey = matchedKey;
+    }
+  }
+
+  await supabase
+    .from("rows")
+    .update({
+      data: { ...row.data, [realKey]: value },
+    })
+    .eq("id", row.id);
+
+  refresh();
+};
 
   // 🔥 🔥 CRITICAL FIX: COLUMN RENAME (WITH JSON UPDATE)
-  const renameColumn = async (columnId, oldName, newName) => {
-    if (!newName || oldName === newName) return;
-
-    console.log("🔁 Renaming:", oldName, "→", newName);
-
-    // 1️⃣ UPDATE COLUMN TABLE
-    const { error: colError } = await supabase
-      .from("columns")
-      .update({ name: newName })
-      .eq("id", columnId);
-
-    if (colError) {
-      console.error("Column update error:", colError);
-      return;
-    }
-
-    // 2️⃣ FETCH ALL ROWS
-    const { data: rowsData } = await supabase
-      .from("rows")
-      .select("*")
-      .eq("sheet_id", sheetId);
-
-    // 3️⃣ UPDATE JSON KEYS
-    for (let row of rowsData || []) {
-      const data = { ...row.data };
-
-      const existingKey = Object.keys(data).find(
-        (k) => normalize(k) === normalize(oldName)
-      );
-
-      if (existingKey) {
-        data[newName] = data[existingKey];
-        delete data[existingKey];
-
-        await supabase
-          .from("rows")
-          .update({ data })
-          .eq("id", row.id);
-      }
-    }
-
-    console.log("✅ Column + rows updated");
-
-    refresh();
-  };
+  
 
   const filtered = rows.filter((r) =>
     Object.values(r.data || {})
@@ -140,12 +110,12 @@ export default function TableView({ rows, columns, refresh, sheetId }) {
                       autoFocus
                       defaultValue={col.name}
                       onBlur={(e) => {
-                        renameColumn(col.id, col.name, e.target.value);
+                        onColumnRename(col.id, col.name, e.target.value);
                         setEditHeader(null);
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                          renameColumn(col.id, col.name, e.target.value);
+                          onColumnRename(col.id, col.name, e.target.value);
                           setEditHeader(null);
                         }
                       }}

@@ -92,6 +92,13 @@ export default function Sheets() {
 
     // 5️⃣ RELOAD
     await load(selectedSheetId);
+
+// 🔥 FORCE UI RESET (VERY IMPORTANT)
+setTimeout(() => {
+  setRows([]);
+  setColumns([]);
+  load(selectedSheetId);
+}, 50);
   };
 
   // 🔥 ADD ROW
@@ -191,12 +198,13 @@ export default function Sheets() {
 
       {/* TABLE */}
       {columns.length > 0 && (
-        <TableView
-          rows={rows}
-          columns={columns}
-          refresh={() => load(selectedSheetId)}
-          onColumnRename={updateColumnName} // ✅ ONLY THIS HANDLES RENAME
-        />
+       <TableView
+  rows={rows}
+  columns={columns}
+  refresh={() => load(selectedSheetId)}
+  sheetId={selectedSheetId}
+  onColumnRename={updateColumnName}
+/>
       )}
 
     </div>
