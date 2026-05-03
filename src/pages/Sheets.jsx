@@ -195,72 +195,83 @@ setTimeout(() => {
  
 
   return (
-    <div className="p-6">
+  <div className="p-6 space-y-6">
 
-      <h1 className="text-2xl font-semibold mb-4">Sheets</h1>
+    {/* HEADER */}
+    <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+      Sheets
+    </h1>
 
-      {/* SHEETS */}
+    {/* SHEETS TABS */}
+    <div className="glass p-4">
       <SheetTabs
         onSelect={(id) => {
           setSelectedSheetId(id);
           load(id);
         }}
       />
-
-      {/* ACTION BAR */}
-      <div className="flex gap-2 mt-4 mb-4">
-
-        <label className="bg-green-600 text-white px-4 py-2 rounded cursor-pointer">
-          Import Workbook
-          <input
-            type="file"
-            hidden
-            onChange={(e) => importExcel(e.target.files[0])}
-          />
-        </label>
-
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder='{"name":"Laptop"}'
-          className="border px-3 py-2 rounded w-full"
-        />
-
-        <button
-  onClick={addRow}
-  className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
->
-  + Row
-</button>
-
-        {(role === "admin" || role === "super_admin") && (
-          <button
-  onClick={addColumn}
-  className="bg-gray-800 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
->
-  + Column
-</button>
-        )}
-      </div>
-
-      {/* EMPTY */}
-      {columns.length === 0 && (
-        <div className="text-gray-400 text-center mt-10">
-          No columns found for this sheet
-        </div>
-      )}
-
-      {/* TABLE */}
-      {columns.length > 0 && (
-       <TableView
-  rows={rows}
-  columns={columns}
-  refresh={() => load(selectedSheetId)}
-  sheetId={selectedSheetId}
-  onColumnRename={updateColumnName}
-/>
-      )}
-
     </div>
-  );
+
+    {/* ACTION BAR */}
+    <div className="glass p-4 flex gap-3 items-center flex-wrap">
+
+      {/* IMPORT */}
+      <label className="btn-primary cursor-pointer">
+        Import Workbook
+        <input
+          type="file"
+          hidden
+          onChange={(e) => importExcel(e.target.files[0])}
+        />
+      </label>
+
+      {/* INPUT */}
+      <input
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder='{"name":"Laptop"}'
+        className="input flex-1 min-w-[250px]"
+      />
+
+      {/* ADD ROW */}
+      <button
+        onClick={addRow}
+        className="btn-primary"
+      >
+        + Row
+      </button>
+
+      {/* ADD COLUMN */}
+      {(role === "admin" || role === "super_admin") && (
+        <button
+          onClick={addColumn}
+          className="bg-gray-800 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
+        >
+          + Column
+        </button>
+      )}
+    </div>
+
+    {/* EMPTY STATE */}
+    {columns.length === 0 && (
+      <div className="glass p-10 text-gray-400 text-center">
+        No columns found for this sheet
+      </div>
+    )}
+
+    {/* TABLE */}
+    {columns.length > 0 && (
+      <div className="glass p-4 overflow-auto">
+        <TableView
+          rows={rows}
+          columns={columns}
+          refresh={() => load(selectedSheetId)}
+          sheetId={selectedSheetId}
+          onColumnRename={updateColumnName}
+        />
+      </div>
+    )}
+
+  </div>
+);
 }

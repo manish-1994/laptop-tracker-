@@ -74,13 +74,13 @@ export default function RecordEditor() {
     loadData();
   };
 
-  return (
-  <div className="p-6 bg-gradient-to-br from-slate-100 to-gray-200 min-h-screen">
+ return (
+  <div className="p-6">
 
-    <div className="bg-white/80 backdrop-blur-lg border rounded-2xl shadow-2xl p-6">
+    <div className="glass p-6 space-y-6">
 
       {/* HEADER */}
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+      <h2 className="text-3xl font-bold flex items-center gap-2">
         🧾
         <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
           Record Editor
@@ -88,11 +88,11 @@ export default function RecordEditor() {
       </h2>
 
       {/* CONTROLS */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 flex-wrap">
         <select
           value={selectedSheet}
           onChange={(e) => setSelectedSheet(e.target.value)}
-          className="px-4 py-2 rounded-xl border shadow-sm"
+          className="input w-64"
         >
           <option value="">Select Sheet</option>
           {sheets.map((s) => (
@@ -106,7 +106,7 @@ export default function RecordEditor() {
           placeholder="🔍 Search record..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2 rounded-xl border shadow-sm"
+          className="input flex-1 min-w-[250px]"
         />
       </div>
 
@@ -120,8 +120,8 @@ export default function RecordEditor() {
             className={`p-4 rounded-xl border cursor-pointer transition shadow-sm
               ${
                 selectedRow?.id === row.id
-                  ? "bg-indigo-100 border-indigo-400"
-                  : "hover:bg-gray-100"
+                  ? "bg-indigo-100 border-indigo-400 shadow-md"
+                  : "bg-white/60 hover:bg-indigo-50"
               }`}
           >
             <div className="font-medium text-gray-700">
@@ -135,11 +135,19 @@ export default function RecordEditor() {
 
     {/* 🔥 SIDE DRAWER */}
     {selectedRow && (
-      <div className="fixed top-0 right-0 w-[400px] h-full bg-white shadow-2xl p-6 overflow-auto border-l z-50">
+      <div className="fixed top-0 right-0 w-[420px] h-full bg-white/90 backdrop-blur-xl shadow-2xl p-6 overflow-auto border-l z-50">
 
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Edit Record</h3>
-          <button onClick={() => setSelectedRow(null)}>✕</button>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold text-gray-700">
+            Edit Record
+          </h3>
+
+          <button
+            onClick={() => setSelectedRow(null)}
+            className="text-gray-500 hover:text-red-500 text-lg"
+          >
+            ✕
+          </button>
         </div>
 
         <div className="space-y-4">
@@ -152,11 +160,13 @@ export default function RecordEditor() {
             return (
               <div
                 key={col.id}
-                className={`p-3 rounded-lg border ${
-                  changed ? "border-indigo-400 bg-indigo-50" : ""
+                className={`p-3 rounded-xl border transition ${
+                  changed
+                    ? "border-indigo-400 bg-indigo-50 shadow-sm"
+                    : "bg-white/60"
                 }`}
               >
-                <label className="text-xs text-gray-500">
+                <label className="text-xs text-gray-500 font-medium">
                   {col.name}
                 </label>
 
@@ -172,13 +182,12 @@ export default function RecordEditor() {
 
                     setFormData(updated);
 
-                    // 🔥 AUTO SAVE
                     await supabase
                       .from("rows")
                       .update({ data: updated })
                       .eq("id", selectedRow.id);
                   }}
-                  className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
                 />
               </div>
             );
@@ -187,7 +196,7 @@ export default function RecordEditor() {
           {/* DELETE */}
           <button
             onClick={deleteRow}
-            className="w-full bg-red-500 text-white py-2 rounded-lg mt-4 hover:bg-red-600"
+            className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-2 rounded-xl shadow hover:scale-105 transition mt-4"
           >
             Delete Record
           </button>

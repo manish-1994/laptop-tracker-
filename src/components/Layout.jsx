@@ -10,64 +10,91 @@ export default function Layout({ children, setUser }) {
     navigate("/");
   };
 
+  console.log("NEW LAYOUT LOADED");
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200">
 
       {/* SIDEBAR */}
-      <div className="w-64 bg-gray-900 text-white p-5 flex flex-col">
+      <div className="w-64 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-5 flex flex-col shadow-2xl">
 
-        <h1 className="text-xl font-bold mb-6">Asset OS</h1>
+        {/* LOGO */}
+        <h1 className="text-2xl font-bold mb-8 tracking-wide">
+          Asset OS
+        </h1>
 
-        <nav className="flex flex-col gap-3">
+        <nav className="flex flex-col gap-2">
 
-          {/* ✅ FIXED ROUTE */}
-          <Link to="/dashboard" className="hover:text-indigo-400">
+          <Link
+            to="/dashboard"
+            className="px-3 py-2 rounded-lg hover:bg-white/10 transition"
+          >
             Dashboard
           </Link>
 
           {user.role === "super_admin" && (
-            <Link to="/sheets" className="hover:text-indigo-400">
+            <Link
+              to="/sheets"
+              className="px-3 py-2 rounded-lg hover:bg-white/10 transition"
+            >
               Sheets
             </Link>
           )}
 
-          {/* 👇 ADD THIS EXACTLY HERE */}
           {(user.role === "user" || user.role === "admin" || user.role === "super_admin") && (
-            <Link to="/records">Record Manager</Link>
+            <Link
+              to="/records"
+              className="px-3 py-2 rounded-lg hover:bg-white/10 transition"
+            >
+              Record Manager
+            </Link>
           )}
 
           {(user.role === "user" ||
             user.role === "admin" ||
             user.role === "super_admin") && (
-              <Link to="/editor" className="hover:text-indigo-400">
+              <Link
+                to="/editor"
+                className="px-3 py-2 rounded-lg hover:bg-white/10 transition"
+              >
                 Record Editor
               </Link>
             )}
 
-
           {user.role === "super_admin" && (
-            <Link to="/admin">Admin Panel</Link>
+            <Link
+              to="/admin"
+              className="px-3 py-2 rounded-lg hover:bg-white/10 transition"
+            >
+              Admin Panel
+            </Link>
           )}
-
 
           {(user.role === "admin" || user.role === "super_admin") && (
-            <Link to="/logs">Logs</Link>
+            <Link
+              to="/logs"
+              className="px-3 py-2 rounded-lg hover:bg-white/10 transition"
+            >
+              Logs
+            </Link>
           )}
-
 
         </nav>
 
+        {/* LOGOUT */}
         <button
           onClick={logout}
-          className="mt-auto text-red-400 hover:text-red-600"
+          className="mt-auto px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition"
         >
           Logout
         </button>
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 p-6 bg-gray-50 overflow-auto">
-        {children}
+      <div className="flex-1 p-6 overflow-auto">
+        <div className="bg-white/70 backdrop-blur-xl border border-white/30 shadow-xl rounded-2xl p-6 min-h-full">
+          {children}
+        </div>
       </div>
 
     </div>

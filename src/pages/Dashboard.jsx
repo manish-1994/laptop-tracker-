@@ -193,35 +193,66 @@ export default function Dashboard() {
   return (
     <div className="p-6 space-y-6">
 
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      {/* HEADER */}
+      <div className="flex items-center gap-4">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+          Dashboard
+        </h1>
 
-      <select
-        value={selectedSheet}
-        onChange={(e) => setSelectedSheet(e.target.value)}
-        className="border p-2 rounded"
-      >
-        {sheets.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.name}
-          </option>
-        ))}
-      </select>
+        <select
+          value={selectedSheet}
+          onChange={(e) => setSelectedSheet(e.target.value)}
+          className="input w-64"
+        >
+          {sheets.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <p className="text-gray-500">
-        Active Column: {config?.chart_column || "Auto (@)"}
-      </p>
+      {/* ACTIVE COLUMN */}
+      <div className="glass p-4 flex justify-between items-center">
+        <p className="text-gray-600">
+          Active Column:
+        </p>
+        <span className="font-semibold text-indigo-600">
+          {config?.chart_column || "Auto (@)"}
+        </span>
+      </div>
 
       {/* STATS */}
       <div className="grid grid-cols-4 gap-4">
-        <Card title="Assigned" value={stats.assigned} color="bg-blue-500" />
-        <Card title="Unassigned" value={stats.unassigned} color="bg-green-500" />
-        <Card title="Returned" value={stats.returned} color="bg-yellow-500" />
-        <Card title="Other" value={stats.other} color="bg-gray-500" />
+
+        <div className="glass p-4 flex flex-col items-center">
+          <span className="text-sm text-gray-500">Assigned</span>
+          <span className="text-2xl font-bold text-blue-500">{stats.assigned}</span>
+        </div>
+
+        <div className="glass p-4 flex flex-col items-center">
+          <span className="text-sm text-gray-500">Unassigned</span>
+          <span className="text-2xl font-bold text-green-500">{stats.unassigned}</span>
+        </div>
+
+        <div className="glass p-4 flex flex-col items-center">
+          <span className="text-sm text-gray-500">Returned</span>
+          <span className="text-2xl font-bold text-yellow-500">{stats.returned}</span>
+        </div>
+
+        <div className="glass p-4 flex flex-col items-center">
+          <span className="text-sm text-gray-500">Other</span>
+          <span className="text-2xl font-bold text-gray-600">{stats.other}</span>
+        </div>
+
       </div>
 
       {/* CHART */}
-      <div className="bg-white p-6 rounded shadow mt-6">
-        <h2 className="mb-4 font-semibold">Analytics</h2>
+      <div className="glass p-6">
+
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">
+          Analytics Overview
+        </h2>
 
         {chartData.length === 0 ? (
           <p className="text-red-500">
@@ -230,11 +261,12 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-2 gap-6">
 
-            <div className="flex flex-col items-center">
-              <h3 className="mb-2 font-medium">Pie Chart</h3>
+            {/* PIE */}
+            <div className="bg-white/60 rounded-xl p-4 shadow-sm flex flex-col items-center">
+              <h3 className="mb-2 font-medium text-gray-600">Pie Chart</h3>
 
-              <PieChart width={350} height={300}>
-                <Pie data={chartData} dataKey="value" nameKey="name" outerRadius={100}>
+              <PieChart width={320} height={260}>
+                <Pie data={chartData} dataKey="value" nameKey="name" outerRadius={90}>
                   {chartData.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
@@ -243,10 +275,11 @@ export default function Dashboard() {
               </PieChart>
             </div>
 
-            <div className="flex flex-col items-center">
-              <h3 className="mb-2 font-medium">Bar Chart</h3>
+            {/* BAR */}
+            <div className="bg-white/60 rounded-xl p-4 shadow-sm flex flex-col items-center">
+              <h3 className="mb-2 font-medium text-gray-600">Bar Chart</h3>
 
-              <BarChart width={400} height={300} data={chartData}>
+              <BarChart width={350} height={260} data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -258,6 +291,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
     </div>
   );
 }
