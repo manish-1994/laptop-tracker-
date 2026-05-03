@@ -41,9 +41,15 @@ export default function App() {
   <Route path="/sheets" element={<Sheets />} />
 
   {/* 🔒 ROLE BASED */}
-  {(user.role === "admin" || user.role === "super_admin") && (
-    <Route path="/admin" element={<Admin />} />
-  )}
+ // 🔒 ONLY SUPER ADMIN CAN ACCESS ADMIN PANEL
+{user.role === "super_admin" && (
+  <Route path="/admin" element={<Admin />} />
+)}
+
+// 🔥 ADMIN + SUPER ADMIN CAN ACCESS LOGS
+{(user.role === "admin" || user.role === "super_admin") && (
+  <Route path="/logs" element={<Logs />} />
+)}
 
   {user.role === "super_admin" && (
     <Route path="/logs" element={<Logs />} />

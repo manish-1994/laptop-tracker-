@@ -29,17 +29,15 @@ export default function Layout({ children, setUser }) {
             Sheets
           </Link>
 
-          {(user?.role === "admin" || user?.role === "super_admin") && (
-            <Link to="/admin" className="hover:text-indigo-400">
-              Admin Panel
-            </Link>
-          )}
+          {user.role === "super_admin" && (
+  <Link to="/admin">Admin Panel</Link>
+)}
 
-          {user?.role === "super_admin" && (
-            <Link to="/logs" className="hover:text-indigo-400">
-              Logs
-            </Link>
-          )}
+          {(user.role === "admin" || user.role === "super_admin") && (
+  <Link to="/logs">Logs</Link>
+)}
+
+
         </nav>
 
         <button
