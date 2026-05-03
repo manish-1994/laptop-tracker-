@@ -66,13 +66,64 @@ const getValue = (row, col) => {
     }
   }
 
-  await supabase
+  const oldValue = row.data?.[realKey] || "";
+
+  // 🚫 skip if same
+  if (oldValue === value) return;
+
+  // 1️⃣ UPDATE DB
+  const { error: updateError } = await supabase
     .from("rows")
     .update({
       data: { ...row.data, [realKey]: value },
     })
     .eq("id", row.id);
 
+  if (updateError) {
+    console.error("❌ Update failed:", updateError);
+    return;
+  }
+
+  // 2️⃣ GET USER (WORKS FOR ALL ROLES)
+  const { data: authData } = await supabase.auth.getUser();
+
+ let userId = null;
+let username = "unknown";
+
+if (authData?.user) {
+  userId = authData.user.id;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", userId)
+    .maybeSingle();
+
+  // ✅ fallback to email if username missing
+  username =
+    profile?.username ||
+    authData.user.email ||
+    "unknown";
+}
+
+  // 3️⃣ INSERT LOG
+  const { error: logError } = await supabase.from("logs").insert({
+    action_type: "UPDATE_CELL",
+    performed_by: userId,
+    user_name: username,
+    column_name: col,
+    old_value: oldValue,
+    new_value: value,
+    description: `Updated ${col}`,
+  });
+
+  if (logError) {
+    console.error("❌ Log failed:", logError);
+  } else {
+    console.log("✅ Log inserted");
+  }
+
+  // 4️⃣ REFRESH
   refresh();
 };
 
