@@ -31,38 +31,48 @@ export default function App() {
     <Layout setUser={setUser}>
       <Routes>
 
-  {/* 🔥 DEFAULT REDIRECT */}
-  <Route path="/" element={<Navigate to="/dashboard" />} />
+        {/* 🔥 DEFAULT REDIRECT */}
+        <Route path="/" element={<Navigate to="/dashboard" />} />
 
-  {/* 🔥 DASHBOARD */}
-  <Route path="/dashboard" element={<Dashboard />} />
+        {/* 🔥 DASHBOARD */}
+        <Route path="/dashboard" element={<Dashboard />} />
 
-  {/* SHEETS */}
-  <Route path="/sheets" element={<Sheets />} />
+        {/* SHEETS */}
+        <Route path="/sheets" element={<Sheets />} />
 
-  {(user.role === "admin" || user.role === "super_admin") && (
-  <Route path="/records" element={<RecordManager />} />
-)}
+        {user.role === "super_admin" && (
+          <Route path="/sheets" element={<Sheets />} />
+        )}
 
-  {/* 🔒 ROLE BASED */}
+        {(user.role === "user" ||
+          user.role === "admin" ||
+          user.role === "super_admin") && (
+            <Route path="/records" element={<RecordManager />} />
+          )}
+
+        {(user.role === "admin" || user.role === "super_admin") && (
+          <Route path="/records" element={<RecordManager />} />
+        )}
+
+        {/* 🔒 ROLE BASED */}
  // 🔒 ONLY SUPER ADMIN CAN ACCESS ADMIN PANEL
-{user.role === "super_admin" && (
-  <Route path="/admin" element={<Admin />} />
-)}
+        {user.role === "super_admin" && (
+          <Route path="/admin" element={<Admin />} />
+        )}
 
 // 🔥 ADMIN + SUPER ADMIN CAN ACCESS LOGS
-{(user.role === "admin" || user.role === "super_admin") && (
-  <Route path="/logs" element={<Logs />} />
-)}
+        {(user.role === "admin" || user.role === "super_admin") && (
+          <Route path="/logs" element={<Logs />} />
+        )}
 
-  {user.role === "super_admin" && (
-    <Route path="/logs" element={<Logs />} />
-  )}
+        {user.role === "super_admin" && (
+          <Route path="/logs" element={<Logs />} />
+        )}
 
-  {/* FALLBACK */}
-  <Route path="*" element={<Navigate to="/dashboard" />} />
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/dashboard" />} />
 
-</Routes>
+      </Routes>
     </Layout>
   );
 }

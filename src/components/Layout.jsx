@@ -25,12 +25,14 @@ export default function Layout({ children, setUser }) {
             Dashboard
           </Link>
 
-          <Link to="/sheets" className="hover:text-indigo-400">
-            Sheets
-          </Link>
+          {user.role === "super_admin" && (
+            <Link to="/sheets" className="hover:text-indigo-400">
+              Sheets
+            </Link>
+          )}
 
           {/* 👇 ADD THIS EXACTLY HERE */}
-          {(user.role === "admin" || user.role === "super_admin") && (
+          {(user.role === "user" || user.role === "admin" || user.role === "super_admin") && (
             <Link to="/records">Record Manager</Link>
           )}
 
@@ -44,7 +46,7 @@ export default function Layout({ children, setUser }) {
             <Link to="/logs">Logs</Link>
           )}
 
-          
+
         </nav>
 
         <button
