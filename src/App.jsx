@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import RecordEditor from "./pages/RecordEditor";
 import { useEffect, useState } from "react";
 import RecordManager from "./pages/RecordManager";
 import Login from "./pages/Login";
@@ -43,6 +44,12 @@ export default function App() {
         {user.role === "super_admin" && (
           <Route path="/sheets" element={<Sheets />} />
         )}
+
+        {(user.role === "user" ||
+          user.role === "admin" ||
+          user.role === "super_admin") && (
+            <Route path="/editor" element={<RecordEditor />} />
+          )}
 
         {(user.role === "user" ||
           user.role === "admin" ||

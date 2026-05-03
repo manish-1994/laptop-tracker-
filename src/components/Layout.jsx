@@ -36,6 +36,14 @@ export default function Layout({ children, setUser }) {
             <Link to="/records">Record Manager</Link>
           )}
 
+          {(user.role === "user" ||
+            user.role === "admin" ||
+            user.role === "super_admin") && (
+              <Link to="/editor" className="hover:text-indigo-400">
+                Record Editor
+              </Link>
+            )}
+
 
           {user.role === "super_admin" && (
             <Link to="/admin">Admin Panel</Link>
