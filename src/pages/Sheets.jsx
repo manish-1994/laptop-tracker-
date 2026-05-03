@@ -36,6 +36,94 @@ export default function Sheets() {
     setColumns(colData || []);
   };
 
+  // ➕ ADD ROW (SAFE)
+const addRow = async () => {
+  if (!selectedSheetId) {
+    console.error("❌ No sheet selected");
+    return;
+  }
+
+  // create empty row based on current columns
+  const emptyData = {};
+  columns.forEach((col) => {
+    emptyData[col.name] = "";
+  });
+
+  const { error } = await supabase.from("rows").insert({
+    sheet_id: selectedSheetId,
+    data: emptyData,
+  });
+
+  if (error) {
+    console.error("❌ Add row failed:", error);
+    alert("Failed to add row");
+    return;
+  }
+
+  console.log("✅ Row added");
+
+  // 🔄 reload table
+  load(selectedSheetId);
+};
+
+// ➕ ADD COLUMN (SAFE)
+const addColumn = async () => {
+  if (!selectedSheetId) {
+    console.error("❌ No sheet selected");
+    return;
+  }
+
+  const name = prompt("Enter column name");
+  if (!name || !name.trim()) return;
+
+  // 🚫 prevent duplicates
+  const exists = columns.some(
+    (c) => c.name.trim().toLowerCase() === name.trim().toLowerCase()
+  );
+
+  if (exists) {
+    alert("Column already exists");
+    return;
+  }
+
+  // 1️⃣ INSERT COLUMN
+  const { error: colError } = await supabase.from("columns").insert({
+    sheet_id: selectedSheetId,
+    name: name.trim(),
+  });
+
+  if (colError) {
+    console.error("❌ Column insert failed:", colError);
+    alert("Failed to add column");
+    return;
+  }
+
+  // 2️⃣ UPDATE ALL ROWS (add new key)
+  const { data: rowsData, error: rowsError } = await supabase
+    .from("rows")
+    .select("*")
+    .eq("sheet_id", selectedSheetId);
+
+  if (rowsError) {
+    console.error("❌ Fetch rows failed:", rowsError);
+    return;
+  }
+
+  for (const row of rowsData || []) {
+    await supabase
+      .from("rows")
+      .update({
+        data: { ...row.data, [name.trim()]: "" },
+      })
+      .eq("id", row.id);
+  }
+
+  console.log("✅ Column added");
+
+  // 🔄 reload
+  load(selectedSheetId);
+};
+
   // 🔥 SINGLE SOURCE OF TRUTH (COLUMN RENAME)
   const updateColumnName = async (columnId, oldName, newName) => {
     if (!newName || newName === oldName) return;
@@ -101,44 +189,10 @@ setTimeout(() => {
 }, 50);
   };
 
-  // 🔥 ADD ROW
-  const addRow = async () => {
-    if (!selectedSheetId) return alert("Select sheet first");
 
-    let parsed;
-    try {
-      parsed = JSON.parse(input);
-    } catch {
-      return alert("Invalid JSON");
-    }
-
-    await supabase.from("rows").insert({
-      sheet_id: selectedSheetId,
-      data: parsed,
-    });
-
-    setInput("");
-    load(selectedSheetId);
-  };
 
   // 🔥 ADD COLUMN
-  const addColumn = async () => {
-    if (!selectedSheetId) return alert("Select sheet first");
-
-    let name = prompt("Column name");
-    if (!name) return;
-
-    // ✅ AUTO CLEAN (important)
-    name = name.trim();
-
-    await supabase.from("columns").insert({
-      sheet_id: selectedSheetId,
-      name,
-      type: "text",
-    });
-
-    load(selectedSheetId);
-  };
+ 
 
   return (
     <div className="p-6">
@@ -173,19 +227,19 @@ setTimeout(() => {
         />
 
         <button
-          onClick={addRow}
-          className="bg-indigo-600 text-white px-4 rounded"
-        >
-          + Row
-        </button>
+  onClick={addRow}
+  className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
+>
+  + Row
+</button>
 
         {(role === "admin" || role === "super_admin") && (
           <button
-            onClick={addColumn}
-            className="bg-gray-800 text-white px-4 rounded"
-          >
-            + Column
-          </button>
+  onClick={addColumn}
+  className="bg-gray-800 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
+>
+  + Column
+</button>
         )}
       </div>
 
