@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
+import toast from "react-hot-toast";
 
 
 export default function RecordEditor() {

@@ -1,8 +1,11 @@
 import * as XLSX from "xlsx";
 import { supabase } from "../services/supabase";
+import toast from "react-hot-toast";
 
 export const importExcel = async (file) => {
   if (!file) return;
+
+  const t = toast.loading("Importing Excel... 📥");
 
   try {
     const data = await file.arrayBuffer();
@@ -92,7 +95,7 @@ export const importExcel = async (file) => {
 
       console.log("Rows prepared:", rows.length);
 
-      // 🔥 INSERT IN BATCHES (CRITICAL FIX)
+      // 🔥 INSERT IN BATCHES
       const BATCH_SIZE = 50;
 
       for (let i = 0; i < rows.length; i += BATCH_SIZE) {
@@ -112,10 +115,17 @@ export const importExcel = async (file) => {
       console.log("🎉 Sheet complete:", sheetName);
     }
 
-    alert("🚀 Import finished");
-    window.location.reload();
+    // 🔥 SUCCESS TOAST
+    toast.success("Excel Imported Successfully ✅", { id: t });
+
+setTimeout(() => {
+  window.location.reload();
+}, 1200);
 
   } catch (err) {
     console.error("❌ IMPORT FAILED:", err);
+
+    // 🔥 ERROR TOAST
+    toast.error("Import Failed ❌", { id: t });
   }
 };

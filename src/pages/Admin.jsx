@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
+import toast from "react-hot-toast";
 
 const BATCH_SIZE = 500;
 

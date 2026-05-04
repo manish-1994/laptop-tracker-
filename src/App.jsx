@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Sheets from "./pages/Sheets";
 import Admin from "./pages/Admin";
 import Logs from "./pages/Logs";
-
+import { Toaster } from "react-hot-toast";
 import Layout from "./components/Layout";
 
 export default function App() {
@@ -29,6 +29,36 @@ export default function App() {
 
   // ✅ LOGGED IN
   return (
+  <>
+    <Toaster
+  position="top-right"
+  toastOptions={{
+    duration: 3000,
+    style: {
+      background: "#2A1458",
+      color: "#fff",
+      border: "1px solid rgba(255,255,255,0.1)",
+      borderRadius: "12px",
+      padding: "10px 14px",
+      boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+    },
+
+    success: {
+      iconTheme: {
+        primary: "#F2B95E",   // gold
+        secondary: "#2A1458",
+      },
+    },
+
+    error: {
+      iconTheme: {
+        primary: "#FF653F",   // orange/red
+        secondary: "#2A1458",
+      },
+    },
+  }}
+/>
+
     <Layout setUser={setUser}>
       <Routes>
 
@@ -40,8 +70,6 @@ export default function App() {
 
         {/* SHEETS */}
         <Route path="/sheets" element={<Sheets />} />
-
-
 
         {user.role === "super_admin" && (
           <Route path="/sheets" element={<Sheets />} />
@@ -64,12 +92,10 @@ export default function App() {
         )}
 
         {/* 🔒 ROLE BASED */}
- // 🔒 ONLY SUPER ADMIN CAN ACCESS ADMIN PANEL
         {user.role === "super_admin" && (
           <Route path="/admin" element={<Admin />} />
         )}
 
-// 🔥 ADMIN + SUPER ADMIN CAN ACCESS LOGS
         {(user.role === "admin" || user.role === "super_admin") && (
           <Route path="/logs" element={<Logs />} />
         )}
@@ -83,5 +109,6 @@ export default function App() {
 
       </Routes>
     </Layout>
-  );
+  </>
+);
 }
