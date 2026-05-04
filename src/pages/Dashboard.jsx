@@ -191,109 +191,121 @@ export default function Dashboard() {
   // UI
   // -------------------------
   return (
-    <div className="p-6 space-y-6">
+  <div className="p-6 space-y-6 text-white">
 
-      {/* HEADER */}
-      <div className="flex items-center gap-4">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
-          Dashboard
-        </h1>
+    {/* HEADER */}
+    <div className="flex items-center gap-6">
+      <h1 className="title">
+        Dashboard
+      </h1>
 
-        <select
-          value={selectedSheet}
-          onChange={(e) => setSelectedSheet(e.target.value)}
-          className="input w-64"
-        >
-          {sheets.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        value={selectedSheet}
+        onChange={(e) => setSelectedSheet(e.target.value)}
+        className="input w-64"
+      >
+        {sheets.map((s) => (
+          <option key={s.id} value={s.id}>
+            {s.name}
+          </option>
+        ))}
+      </select>
+    </div>
 
-      {/* ACTIVE COLUMN */}
-      <div className="glass p-4 flex justify-between items-center">
-        <p className="text-gray-600">
-          Active Column:
-        </p>
-        <span className="font-semibold text-indigo-600">
-          {config?.chart_column || "Auto (@)"}
+    {/* ACTIVE COLUMN */}
+    <div className="glass p-4 flex justify-between items-center">
+      <p className="subtext">
+        Active Column:
+      </p>
+      <span className="font-semibold text-[#F2B95E]">
+        {config?.chart_column || "Auto (@)"}
+      </span>
+    </div>
+
+    {/* STATS */}
+    <div className="grid grid-cols-4 gap-5">
+
+      <div className="glass p-5 flex flex-col items-center hover:scale-105 transition">
+        <span className="text-sm subtext">Assigned</span>
+        <span className="text-3xl font-bold text-[#F2B95E]">
+          {stats.assigned}
         </span>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-4 gap-4">
-
-        <div className="glass p-4 flex flex-col items-center">
-          <span className="text-sm text-gray-500">Assigned</span>
-          <span className="text-2xl font-bold text-blue-500">{stats.assigned}</span>
-        </div>
-
-        <div className="glass p-4 flex flex-col items-center">
-          <span className="text-sm text-gray-500">Unassigned</span>
-          <span className="text-2xl font-bold text-green-500">{stats.unassigned}</span>
-        </div>
-
-        <div className="glass p-4 flex flex-col items-center">
-          <span className="text-sm text-gray-500">Returned</span>
-          <span className="text-2xl font-bold text-yellow-500">{stats.returned}</span>
-        </div>
-
-        <div className="glass p-4 flex flex-col items-center">
-          <span className="text-sm text-gray-500">Other</span>
-          <span className="text-2xl font-bold text-gray-600">{stats.other}</span>
-        </div>
-
+      <div className="glass p-5 flex flex-col items-center hover:scale-105 transition">
+        <span className="text-sm subtext">Unassigned</span>
+        <span className="text-3xl font-bold text-[#FF653F]">
+          {stats.unassigned}
+        </span>
       </div>
 
-      {/* CHART */}
-      <div className="glass p-6">
+      <div className="glass p-5 flex flex-col items-center hover:scale-105 transition">
+        <span className="text-sm subtext">Returned</span>
+        <span className="text-3xl font-bold text-white">
+          {stats.returned}
+        </span>
+      </div>
 
-        <h2 className="mb-4 text-lg font-semibold text-gray-700">
-          Analytics Overview
-        </h2>
-
-        {chartData.length === 0 ? (
-          <p className="text-red-500">
-            No chart data. Configure column in Admin Panel.
-          </p>
-        ) : (
-          <div className="grid grid-cols-2 gap-6">
-
-            {/* PIE */}
-            <div className="bg-white/60 rounded-xl p-4 shadow-sm flex flex-col items-center">
-              <h3 className="mb-2 font-medium text-gray-600">Pie Chart</h3>
-
-              <PieChart width={320} height={260}>
-                <Pie data={chartData} dataKey="value" nameKey="name" outerRadius={90}>
-                  {chartData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </div>
-
-            {/* BAR */}
-            <div className="bg-white/60 rounded-xl p-4 shadow-sm flex flex-col items-center">
-              <h3 className="mb-2 font-medium text-gray-600">Bar Chart</h3>
-
-              <BarChart width={350} height={260} data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" />
-              </BarChart>
-            </div>
-
-          </div>
-        )}
+      <div className="glass p-5 flex flex-col items-center hover:scale-105 transition">
+        <span className="text-sm subtext">Other</span>
+        <span className="text-3xl font-bold text-white/70">
+          {stats.other}
+        </span>
       </div>
 
     </div>
-  );
+
+    {/* CHART */}
+    <div className="glass p-6">
+
+      <h2 className="mb-5 font-semibold subtext">
+        Analytics Overview
+      </h2>
+
+      {chartData.length === 0 ? (
+        <p className="text-[#FF653F]">
+          No chart data. Configure column in Admin Panel.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-6">
+
+          {/* PIE */}
+          <div className="glass p-4 flex flex-col items-center">
+            <h3 className="mb-3 text-sm subtext">
+              Pie Chart
+            </h3>
+
+            <PieChart width={320} height={260}>
+              <Pie data={chartData} dataKey="value" nameKey="name" outerRadius={90}>
+                {chartData.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </div>
+
+          {/* BAR */}
+          <div className="glass p-4 flex flex-col items-center">
+            <h3 className="mb-3 text-sm subtext">
+              Bar Chart
+            </h3>
+
+            <BarChart width={350} height={260} data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis dataKey="name" stroke="#ffffff80" />
+              <YAxis stroke="#ffffff80" />
+              <Tooltip />
+              <Bar dataKey="value" fill="#FF653F" />
+            </BarChart>
+          </div>
+
+        </div>
+      )}
+    </div>
+
+  </div>
+);
 }
 
 // -------------------------

@@ -27,20 +27,20 @@ export default function Login({ setUser }) {
   };
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 via-cyan-500 to-indigo-600">
+  <div className="min-h-screen flex items-center justify-center app-bg">
 
     {/* GLASS CARD */}
-    <div className="w-[360px] p-8 rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl">
+    <div className="w-[360px] p-8 rounded-2xl backdrop-blur-xl bg-[#52366B]/50 border border-white/10 shadow-2xl">
 
       {/* ICON */}
       <div className="flex justify-center mb-6">
-        <div className="w-16 h-16 flex items-center justify-center rounded-full border border-white/30">
-          <span className="text-white text-2xl">🔒</span>
+        <div className="w-16 h-16 flex items-center justify-center rounded-full border border-white/20 bg-white/10">
+          <span className="text-2xl">🔒</span>
         </div>
       </div>
 
       {/* TITLE */}
-      <h2 className="text-center text-white text-lg tracking-widest mb-6">
+      <h2 className="text-center text-lg tracking-widest mb-6 title">
         USER LOGIN
       </h2>
 
@@ -50,7 +50,7 @@ export default function Login({ setUser }) {
         placeholder="Email ID"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full bg-transparent border-b border-white/40 text-white placeholder-white/60 px-2 py-2 mb-4 focus:outline-none focus:border-white focus:shadow-[0_0_10px_rgba(255,255,255,0.4)] transition"
+        className="input mb-5"
       />
 
       {/* PASSWORD */}
@@ -59,13 +59,13 @@ export default function Login({ setUser }) {
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="w-full bg-transparent border-b border-white/40 text-white placeholder-white/60 px-2 py-2 mb-6 focus:outline-none focus:border-white focus:shadow-[0_0_10px_rgba(255,255,255,0.4)] transition"
+        className="input mb-6"
       />
 
       {/* BUTTON */}
       <button
-        onClick={login}  
-        className="w-full py-2 rounded-lg bg-black/80 text-white tracking-wider hover:bg-black transition"
+        onClick={login}
+        className="w-full btn-primary tracking-wider"
       >
         LOGIN
       </button>

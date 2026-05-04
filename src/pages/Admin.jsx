@@ -324,38 +324,40 @@ const updateRole = async (id, role) => {
   // --------------------------
   // UI
   // --------------------------
-  return (
-  <div className="p-6 space-y-6">
+ return (
+  <div className="p-6 space-y-6 text-white">
 
-    <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+    {/* HEADER */}
+    <h1 className="title">
       Admin Panel
     </h1>
 
     {/* DATABASE */}
-    <div className="glass p-5">
-      <h2 className="mb-3 font-semibold text-gray-700">Database Usage</h2>
+    <div className="glass p-6">
+      <h2 className="mb-4 font-semibold subtext">Database Usage</h2>
 
-      <p className="text-lg">
-        Used Space: <b>{dbSize}</b>
+      <p className="text-xl font-semibold">
+        Used Space: <span className="text-[#F2B95E]">{dbSize}</span>
       </p>
 
-      <p className="text-sm text-gray-500">
+      <p className="text-sm subtext">
         Free Plan Limit: 500 MB
       </p>
 
       <button
         onClick={loadDbSize}
-        className="mt-3 btn-primary"
+        className="mt-4 btn-primary"
       >
         Refresh
       </button>
     </div>
 
     {/* CREATE USER */}
-    <div className="glass p-5">
-      <h2 className="mb-4 font-semibold text-gray-700">Create User</h2>
+    <div className="glass p-6">
+      <h2 className="mb-5 font-semibold subtext">Create User</h2>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-5">
+
         <input
           placeholder="Username"
           value={newUser.username}
@@ -399,105 +401,115 @@ const updateRole = async (id, role) => {
 
       <button
         onClick={createUser}
-        className="mt-4 btn-primary"
+        className="mt-5 btn-primary"
       >
         Create User
       </button>
     </div>
 
     {/* USERS TABLE */}
-    <div className="glass p-5">
-      <h2 className="mb-4 font-semibold text-gray-700">All Users</h2>
+    <div className="glass p-6">
+      <h2 className="mb-5 font-semibold subtext">All Users</h2>
 
-      <table className="w-full text-sm border-separate border-spacing-y-2">
-        <thead>
-          <tr className="text-left text-gray-600">
-            <th className="p-2">Username</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Role</th>
-            <th className="p-2">User ID</th>
-            <th className="p-2">Action</th>
-          </tr>
-        </thead>
+      <div className="overflow-auto">
+        <table className="w-full text-sm border-separate border-spacing-y-3">
 
-        <tbody>
-          {users
-            .filter((u) => u.role !== "super_admin")
-            .map((u) => (
-              <tr key={u.id} className="bg-white/60 backdrop-blur rounded-xl shadow-sm">
-                <td className="p-2">{u.username}</td>
-                <td className="p-2">{u.email}</td>
+          <thead>
+            <tr className="text-left text-white/60">
+              <th className="p-2">Username</th>
+              <th className="p-2">Email</th>
+              <th className="p-2">Role</th>
+              <th className="p-2">User ID</th>
+              <th className="p-2">Action</th>
+            </tr>
+          </thead>
 
-                <td className="p-2">
-                  <select
-                    value={u.role}
-                    onChange={(e) => updateRole(u.id, e.target.value)}
-                    className="input"
-                  >
-                    <option value="viewer">Viewer</option>
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </td>
+          <tbody>
+            {users
+              .filter((u) => u.role !== "super_admin")
+              .map((u) => (
+                <tr
+                  key={u.id}
+                  className="table-row hover:scale-[1.01] transition"
+                >
+                  <td className="p-3">{u.username}</td>
+                  <td className="p-3">{u.email}</td>
 
-                <td className="p-2 text-xs">{u.id}</td>
+                  <td className="p-3">
+                    <select
+                      value={u.role}
+                      onChange={(e) => updateRole(u.id, e.target.value)}
+                      className="input"
+                    >
+                      <option value="viewer">Viewer</option>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
 
-                <td className="p-2">
-                  <button
-                    onClick={() => deleteUser(u.id)}
-                    className="btn-danger text-sm px-2 py-1"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+                  <td className="p-3 text-xs text-white/60">{u.id}</td>
+
+                  <td className="p-3">
+                    <button
+                      onClick={() => deleteUser(u.id)}
+                      className="btn-danger text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+
+        </table>
+      </div>
     </div>
 
     {/* DASHBOARD CONFIG */}
-    <div className="glass p-5">
-      <h2 className="mb-4 font-semibold text-gray-700">Dashboard Config</h2>
+    <div className="glass p-6">
+      <h2 className="mb-5 font-semibold subtext">Dashboard Config</h2>
 
-      <select
-        className="input mb-3"
-        value={selectedSheet}
-        onChange={(e) => handleSheetChange(e.target.value)}
-      >
-        <option value="">Select Sheet</option>
-        {sheets.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.name}
-          </option>
-        ))}
-      </select>
+      <div className="grid grid-cols-3 gap-5">
 
-      <select
-        className="input mb-3"
-        value={selectedColumn}
-        onChange={(e) => setSelectedColumn(e.target.value)}
-      >
-        <option value="">Select Column</option>
-        {columns.map((c) => (
-          <option key={c.id} value={c.name}>
-            {c.name}
-          </option>
-        ))}
-      </select>
+        <select
+          className="input"
+          value={selectedSheet}
+          onChange={(e) => handleSheetChange(e.target.value)}
+        >
+          <option value="">Select Sheet</option>
+          {sheets.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
 
-      <select
-        className="input mb-3"
-        value={chartType}
-        onChange={(e) => setChartType(e.target.value)}
-      >
-        <option value="pie">Pie</option>
-        <option value="bar">Bar</option>
-      </select>
+        <select
+          className="input"
+          value={selectedColumn}
+          onChange={(e) => setSelectedColumn(e.target.value)}
+        >
+          <option value="">Select Column</option>
+          {columns.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="input"
+          value={chartType}
+          onChange={(e) => setChartType(e.target.value)}
+        >
+          <option value="pie">Pie</option>
+          <option value="bar">Bar</option>
+        </select>
+      </div>
 
       <button
         onClick={saveConfig}
-        className="btn-primary"
+        className="mt-5 btn-primary"
       >
         Save Chart Config
       </button>
@@ -505,11 +517,11 @@ const updateRole = async (id, role) => {
 
     {/* DELETE */}
     {profile.role === "super_admin" && (
-      <div className="glass p-5">
-        <h2 className="mb-4 font-semibold text-gray-700">Data Control</h2>
+      <div className="glass p-6">
+        <h2 className="mb-5 font-semibold text-[#FF653F]">Data Control</h2>
 
         <select
-          className="input mb-3"
+          className="input mb-4"
           value={selectedSheet}
           onChange={(e) => setSelectedSheet(e.target.value)}
         >
@@ -521,7 +533,7 @@ const updateRole = async (id, role) => {
           ))}
         </select>
 
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <button
             onClick={deleteSelectedSheet}
             className="btn-danger"
@@ -531,18 +543,19 @@ const updateRole = async (id, role) => {
 
           <button
             onClick={deleteAll}
-            className="bg-gradient-to-r from-red-700 to-red-900 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
+            className="btn-primary"
           >
             Delete Everything
           </button>
         </div>
 
         {loading && (
-          <p className="mt-3 text-gray-500">{progress}</p>
+          <p className="mt-3 text-white/60">{progress}</p>
         )}
       </div>
     )}
 
   </div>
 );
+
 }

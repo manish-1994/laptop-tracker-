@@ -74,16 +74,16 @@ export default function RecordManager() {
     loadData();
   };
 
-  return (
-  <div className="p-6">
+ return (
+  <div className="p-6 text-white">
 
-    <div className="glass p-6 space-y-6">
+    <div className="bg-[#2A1458]/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-6 space-y-6">
 
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold flex items-center gap-2">
           📊
-          <span className="bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+          <span className="bg-gradient-to-r from-[#FF653F] to-[#F2B95E] text-transparent bg-clip-text">
             Record Manager
           </span>
         </h2>
@@ -93,44 +93,61 @@ export default function RecordManager() {
       <div className="flex gap-4 flex-wrap">
 
         <select
-          value={selectedSheet}
-          onChange={(e) => setSelectedSheet(e.target.value)}
-          className="input w-64"
-        >
-          <option value="">Select Sheet</option>
-          {sheets.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+  value={selectedSheet}
+  onChange={(e) => setSelectedSheet(e.target.value)}
+  className="
+    px-4 py-2 rounded-xl
+    bg-[#2A1458]/70 text-white
+    border border-white/20
+    backdrop-blur-xl
+    shadow-md
+    focus:ring-2 focus:ring-[#FF653F]
+    outline-none
+    appearance-none
+    cursor-pointer
+  "
+>
+  <option value="" className="bg-[#2A1458] text-white">
+    Select Sheet
+  </option>
+
+  {sheets.map((s) => (
+    <option
+      key={s.id}
+      value={s.id}
+      className="bg-[#2A1458] text-white"
+    >
+      {s.name}
+    </option>
+  ))}
+</select>
 
         <input
           placeholder="Search records..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="input flex-1 min-w-[250px]"
+          className="flex-1 min-w-[250px] px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:ring-2 focus:ring-[#FF653F] outline-none"
         />
 
       </div>
 
       {/* TABLE */}
-      <div className="overflow-auto max-h-[70vh] rounded-xl border border-gray-200">
+      <div className="overflow-auto max-h-[70vh] rounded-xl border border-white/10">
 
-        <table className="w-full text-sm border-collapse">
+        <table className="w-full text-sm border-separate border-spacing-y-2">
 
           {/* HEADER */}
-          <thead className="bg-gradient-to-r from-gray-900 to-gray-800 text-white sticky top-0 z-10">
+          <thead className="bg-[#52366B]/80 backdrop-blur sticky top-0 z-10">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.id}
-                  className="px-4 py-3 text-left text-xs uppercase tracking-wide"
+                  className="px-4 py-3 text-left text-xs uppercase tracking-wide text-white/80 whitespace-nowrap"
                 >
                   {col.name}
                 </th>
               ))}
-              <th className="px-4 py-3 text-xs uppercase">Actions</th>
+              <th className="px-4 py-3 text-xs uppercase text-white/80">Actions</th>
             </tr>
           </thead>
 
@@ -140,15 +157,13 @@ export default function RecordManager() {
             {filtered.map((row, index) => (
               <tr
                 key={row.id}
-                className={`transition ${
-                  index % 2 === 0 ? "bg-white/70" : "bg-white/40"
-                } hover:bg-indigo-50`}
+                className="bg-[#2A1458]/60 hover:bg-[#52366B]/40 transition rounded-xl"
               >
 
                 {columns.map((col) => (
                   <td
                     key={col.id}
-                    className="px-4 py-3 text-gray-700"
+                    className="px-4 py-3 text-white whitespace-nowrap"
                   >
                     {editingRow === row.id ? (
                       <input
@@ -159,10 +174,12 @@ export default function RecordManager() {
                             [col.name]: e.target.value,
                           })
                         }
-                        className="input"
+                        className="w-full px-2 py-1 rounded bg-white/10 border border-white/20 text-white"
                       />
                     ) : (
-                      row.data[col.name] || "-"
+                      <span className={!row.data[col.name] ? "text-white/40 italic" : ""}>
+                        {row.data[col.name] || "Empty"}
+                      </span>
                     )}
                   </td>
                 ))}
@@ -174,14 +191,14 @@ export default function RecordManager() {
                     <>
                       <button
                         onClick={() => saveEdit(row.id)}
-                        className="bg-green-500/10 text-green-600 px-3 py-1 rounded-lg hover:bg-green-500 hover:text-white transition"
+                        className="px-3 py-1 rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500 hover:text-white transition"
                       >
                         Save
                       </button>
 
                       <button
                         onClick={() => setEditingRow(null)}
-                        className="bg-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-300 transition"
+                        className="px-3 py-1 rounded-lg bg-white/10 text-white/70 hover:bg-white/20 transition"
                       >
                         Cancel
                       </button>
@@ -190,14 +207,14 @@ export default function RecordManager() {
                     <>
                       <button
                         onClick={() => startEdit(row)}
-                        className="bg-indigo-500/10 text-indigo-600 px-3 py-1 rounded-lg hover:bg-indigo-500 hover:text-white transition"
+                        className="px-3 py-1 rounded-lg bg-[#FF653F]/20 text-[#FF653F] hover:bg-[#FF653F] hover:text-white transition"
                       >
                         Edit
                       </button>
 
                       <button
                         onClick={() => deleteRow(row.id)}
-                        className="bg-red-500/10 text-red-600 px-3 py-1 rounded-lg hover:bg-red-500 hover:text-white transition"
+                        className="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition"
                       >
                         Delete
                       </button>

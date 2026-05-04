@@ -195,10 +195,10 @@ setTimeout(() => {
  
 
   return (
-  <div className="p-6 space-y-6">
+  <div className="p-6 space-y-6 text-white">
 
     {/* HEADER */}
-    <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+    <h1 className="title">
       Sheets
     </h1>
 
@@ -245,30 +245,48 @@ setTimeout(() => {
       {(role === "admin" || role === "super_admin") && (
         <button
           onClick={addColumn}
-          className="bg-gray-800 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
+          className="btn-primary"
         >
           + Column
         </button>
       )}
+
     </div>
 
     {/* EMPTY STATE */}
     {columns.length === 0 && (
-      <div className="glass p-10 text-gray-400 text-center">
-        No columns found for this sheet
+      <div className="glass p-12 text-center">
+
+        <div className="text-4xl mb-3">📄</div>
+
+        <p className="text-white/80 text-lg">
+          No columns found for this sheet
+        </p>
+
+        <p className="text-sm text-white/50 mt-2">
+          Start by adding a column or importing a workbook
+        </p>
+
       </div>
     )}
 
     {/* TABLE */}
     {columns.length > 0 && (
-      <div className="glass p-4 overflow-auto">
-        <TableView
-          rows={rows}
-          columns={columns}
-          refresh={() => load(selectedSheetId)}
-          sheetId={selectedSheetId}
-          onColumnRename={updateColumnName}
-        />
+      <div className="glass p-4">
+
+        {/* 🔥 IMPORTANT WRAPPER FIX */}
+        <div className="rounded-xl overflow-auto bg-[#2A1458]/40 border border-white/10">
+
+          <TableView
+            rows={rows}
+            columns={columns}
+            refresh={() => load(selectedSheetId)}
+            sheetId={selectedSheetId}
+            onColumnRename={updateColumnName}
+          />
+
+        </div>
+
       </div>
     )}
 

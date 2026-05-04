@@ -100,14 +100,14 @@ export default function RecordEditor() {
 
  return (
   <>
-    <div className="p-6">
+    <div className="p-6 text-white">
 
-      <div className="glass p-6 space-y-6">
+      <div className="bg-[#2A1458]/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-6 space-y-6">
 
         {/* HEADER */}
         <h2 className="text-3xl font-bold flex items-center gap-2">
           🧾
-          <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#FF653F] to-[#F2B95E] bg-clip-text text-transparent">
             Record Editor
           </span>
         </h2>
@@ -117,30 +117,48 @@ export default function RecordEditor() {
 
           <button
             onClick={() => setShowAdd(true)}
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF653F] to-[#F2B95E] text-white shadow hover:scale-105 transition"
           >
             + Add Record
           </button>
 
           <select
-            value={selectedSheet}
-            onChange={(e) => setSelectedSheet(e.target.value)}
-            className="input w-64"
-          >
-            <option value="">Select Sheet</option>
-            {sheets.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+  value={selectedSheet}
+  onChange={(e) => setSelectedSheet(e.target.value)}
+  className="
+    px-4 py-2 rounded-xl
+    bg-[#2A1458]/70 text-white
+    border border-white/20
+    backdrop-blur-xl
+    shadow-md
+    focus:ring-2 focus:ring-[#FF653F]
+    outline-none
+    appearance-none
+    cursor-pointer
+  "
+>
+  <option value="" className="bg-[#2A1458] text-white">
+    Select Sheet
+  </option>
+
+  {sheets.map((s) => (
+    <option
+      key={s.id}
+      value={s.id}
+      className="bg-[#2A1458] text-white"
+    >
+      {s.name}
+    </option>
+  ))}
+</select>
 
           <input
             placeholder="🔍 Search record..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="input flex-1 min-w-[250px]"
+            className="flex-1 min-w-[250px] px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:ring-2 focus:ring-[#FF653F] outline-none"
           />
+
         </div>
 
         {/* RECORD LIST */}
@@ -149,14 +167,14 @@ export default function RecordEditor() {
             <div
               key={row.id}
               onClick={() => selectRow(row)}
-              className={`p-4 rounded-xl border cursor-pointer transition shadow-sm
+              className={`p-4 rounded-xl border cursor-pointer transition
                 ${
                   selectedRow?.id === row.id
-                    ? "bg-indigo-100 border-indigo-400 shadow-md"
-                    : "bg-white/60 hover:bg-indigo-50"
+                    ? "bg-[#52366B] border-[#FF653F] shadow-lg"
+                    : "bg-[#2A1458]/60 hover:bg-[#52366B]/40 border-white/10"
                 }`}
             >
-              <div className="font-medium text-gray-700">
+              <div className="font-medium text-white">
                 {Object.values(row.data).slice(0, 2).join(" - ")}
               </div>
             </div>
@@ -166,16 +184,16 @@ export default function RecordEditor() {
 
       {/* 🔥 EDIT DRAWER */}
       {selectedRow && (
-        <div className="fixed top-0 right-0 w-[600px] h-full bg-white/90 backdrop-blur-xl shadow-2xl p-6 overflow-auto border-l z-50">
+        <div className="fixed top-0 right-0 w-[600px] h-full bg-[#1A0F3A] backdrop-blur-xl shadow-2xl p-6 overflow-auto border-l border-white/10 z-50">
 
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-700">
+            <h3 className="text-xl font-semibold text-white">
               Edit Record
             </h3>
 
             <button
               onClick={() => setSelectedRow(null)}
-              className="text-gray-500 hover:text-red-500 text-lg"
+              className="text-white/60 hover:text-red-400 text-lg"
             >
               ✕
             </button>
@@ -194,14 +212,13 @@ export default function RecordEditor() {
                   key={col.id}
                   className={`p-3 rounded-xl border transition ${
                     changed
-                      ? "border-indigo-400 bg-indigo-50 shadow-sm"
-                      : "bg-white/60"
+                      ? "border-[#FF653F] bg-[#52366B]/30"
+                      : "bg-[#2A1458]/60 border-white/10"
                   }`}
                 >
-                  {/* ✅ PREMIUM LABEL FIX */}
                   <label
                     title={col.name}
-                    className="text-xs text-gray-500 font-medium mb-1 leading-tight break-words line-clamp-2"
+                    className="text-xs text-white/60 mb-1 block"
                   >
                     {col.name}
                   </label>
@@ -223,7 +240,7 @@ export default function RecordEditor() {
                         .update({ data: updated })
                         .eq("id", selectedRow.id);
                     }}
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none text-sm"
+                    className="w-full mt-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-[#FF653F] outline-none text-sm"
                   />
                 </div>
               );
@@ -242,13 +259,13 @@ export default function RecordEditor() {
       )}
     </div>
 
-    {/* 🔥 ADD RECORD MODAL (FIXED POSITION + PREMIUM) */}
+    {/* 🔥 ADD RECORD MODAL */}
     {showAdd && (
-      <div className="fixed inset-0 bg-black/40 flex items-start justify-center pt-10 z-50 overflow-y-auto">
+      <div className="fixed inset-0 bg-black/60 flex items-start justify-center pt-10 z-50 overflow-y-auto">
 
-        <div className="bg-white rounded-2xl shadow-2xl p-6 w-[1000px] max-w-[95vw] animate-[fadeIn_0.2s_ease]">
+        <div className="bg-[#1A0F3A] border border-white/10 rounded-2xl shadow-2xl p-6 w-[1000px] max-w-[95vw]">
 
-          <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+          <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-[#FF653F] to-[#F2B95E] text-transparent bg-clip-text">
             Add New Record
           </h3>
 
@@ -257,11 +274,7 @@ export default function RecordEditor() {
             {columns.map((col) => (
               <div key={col.id} className="flex flex-col">
 
-                {/* ✅ PREMIUM LABEL FIX */}
-                <label
-                  title={col.name}
-                  className="text-xs text-gray-500 mb-1 leading-tight break-words line-clamp-2"
-                >
+                <label className="text-xs text-white/60 mb-1">
                   {col.name}
                 </label>
 
@@ -273,7 +286,7 @@ export default function RecordEditor() {
                       [col.name]: e.target.value,
                     })
                   }
-                  className="border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none text-sm"
+                  className="px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-[#FF653F] outline-none text-sm"
                 />
               </div>
             ))}
@@ -284,14 +297,14 @@ export default function RecordEditor() {
 
             <button
               onClick={() => setShowAdd(false)}
-              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+              className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20"
             >
               Cancel
             </button>
 
             <button
               onClick={addRecord}
-              className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg shadow hover:scale-105 transition"
+              className="px-4 py-2 bg-gradient-to-r from-[#FF653F] to-[#F2B95E] text-white rounded-lg shadow hover:scale-105 transition"
             >
               Save
             </button>

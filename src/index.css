@@ -5,13 +5,9 @@
 /* 🔥 GLOBAL DESIGN SYSTEM */
 
 body {
-  @apply bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 text-gray-800;
   font-family: Inter, system-ui, -apple-system, sans-serif;
-}
-
-/* Card system */
-.card {
-  @apply bg-white/80 backdrop-blur-md border border-gray-200 shadow-xl rounded-2xl;
+  background: linear-gradient(135deg, #2A1458, #52366B);
+  color: white;
 }
 
 /* Smooth UI */
@@ -25,7 +21,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5f5;
+  background: #52366B;
   border-radius: 10px;
 }
 
@@ -34,46 +30,134 @@ body {
 }
 
 /* Inputs focus */
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #6366f1;
+  box-shadow: 0 0 0 2px #FF653F;
 }
 
 /* Button press effect */
 button:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
+/* 🌈 ROOT COLORS */
 :root {
-  --primary: #6366f1;
-  --secondary: #8b5cf6;
+  --primary: #2A1458;
+  --secondary: #52366B;
+  --accent: #FF653F;
+  --accent-soft: #F2B95E;
 }
 
-/* Background */
+/* 🌌 APP BACKGROUND */
 .app-bg {
-  @apply min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200;
+  @apply min-h-screen;
+  background: linear-gradient(135deg, #2A1458, #52366B);
 }
 
-/* Glass card */
+/* 🧊 GLASS CARD */
 .glass {
-  @apply bg-white/70 backdrop-blur-xl border border-white/30 shadow-2xl rounded-2xl;
+  background: rgba(82, 54, 107, 0.65);
+  backdrop-filter: blur(16px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* Buttons */
+/* 📦 CARD (lighter variant) */
+.card {
+  background: rgba(82, 54, 107, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 🟠 PRIMARY BUTTON */
 .btn-primary {
-  @apply bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition;
+  background: linear-gradient(90deg, #FF653F, #F2B95E);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(255, 101, 63, 0.35);
+  transition: 0.3s;
 }
 
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 101, 63, 0.5);
+}
+
+/* 🔴 DANGER BUTTON */
 .btn-danger {
-  @apply bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl shadow hover:scale-105 transition;
+  background: #FF653F;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(255, 101, 63, 0.3);
 }
 
-/* Inputs */
+.btn-danger:hover {
+  background: #e5532f;
+}
+
+/* ✏️ INPUTS */
 .input {
-  @apply px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none w-full;
+  background: rgba(82, 54, 107, 0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 12px;
+  color: white;
+  border-radius: 10px;
+  outline: none;
+  width: 100%;
 }
 
-/* Section title */
+/* 👇 VERY IMPORTANT */
+.input option {
+  background: #2A1458;
+  color: white;
+}
+
+.input option:hover {
+  background: #52366B;
+}
+
+/* 🏷 TITLE */
 .title {
-  @apply text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text;
+  font-size: 26px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #FF653F, #F2B95E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 🟡 SUBTEXT */
+.subtext {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* 🧱 TABLE ROW */
+.table-row {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+}
+
+.table-row:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ✨ ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.25s ease;
 }

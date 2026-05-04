@@ -21,23 +21,28 @@ export default function SheetTabs({ onSelect }) {
   };
 
   return (
-    <div className="flex gap-2 flex-wrap">
-      {sheets.map((s) => (
-        <button
-          key={s.id}
-          onClick={() => {
-            setActive(s.id);
-            onSelect(s.id);
-          }}
-          className={`px-4 py-2 rounded ${
+  <div className="flex gap-2 flex-wrap">
+
+    {sheets.map((s) => (
+      <button
+        key={s.id}
+        onClick={() => {
+          setActive(s.id);
+          onSelect(s.id);
+        }}
+        className={`
+          px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200
+          ${
             active === s.id
-              ? "bg-indigo-600 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          {s.name}
-        </button>
-      ))}
-    </div>
-  );
+              ? "bg-gradient-to-r from-[#FF653F] to-[#F2B95E] text-white shadow-lg"
+              : "bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
+          }
+        `}
+      >
+        {s.name}
+      </button>
+    ))}
+
+  </div>
+);
 }

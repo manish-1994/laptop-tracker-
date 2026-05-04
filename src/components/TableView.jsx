@@ -231,128 +231,145 @@ export default function TableView({ rows, columns, refresh, sheetId, onColumnRen
   );
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-4">
-      <input
-        placeholder="🔍 Search..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 w-full px-4 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500" />
+  <div className="bg-[#2A1458]/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-4 text-white">
 
-      <div className="overflow-auto max-h-[70vh]">
-        <table className="w-full text-sm border-separate border-spacing-y-2">
+    {/* SEARCH */}
+    <input
+      placeholder="🔍 Search..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="mb-4 w-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:ring-2 focus:ring-[#FF653F] outline-none"
+    />
 
-          {/* HEADER */}
-          <thead className="bg-white/80 backdrop-blur sticky top-0 border-b">
-            <tr>
-              {columns.map((col) => (
-                <th key={col.id} className="px-3 py-2 text-left text-xs font-semibold text-gray-700 tracking-tight">
+    <div className="overflow-auto max-h-[70vh]">
 
-                  {editHeader === col.id ? (
-                    <input
-                      autoFocus
-                      defaultValue={col.name}
-                      onBlur={(e) => {
+      <table className="w-full text-sm border-separate border-spacing-y-2">
+
+        {/* HEADER */}
+        <thead className="bg-[#52366B]/80 backdrop-blur sticky top-0 z-10">
+          <tr>
+            {columns.map((col) => (
+              <th
+                key={col.id}
+                className="px-3 py-3 text-left text-xs font-semibold text-white/80 whitespace-nowrap"
+              >
+
+                {editHeader === col.id ? (
+                  <input
+                    autoFocus
+                    defaultValue={col.name}
+                    onBlur={(e) => {
+                      onColumnRename(col.id, col.name, e.target.value);
+                      setEditHeader(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
                         onColumnRename(col.id, col.name, e.target.value);
                         setEditHeader(null);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          onColumnRename(col.id, col.name, e.target.value);
-                          setEditHeader(null);
-                        }
-                      }}
-                      className="border px-2 py-1 rounded w-full"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2">
+                      }
+                    }}
+                    className="bg-white/10 border border-white/20 text-white px-2 py-1 rounded w-full"
+                  />
+                ) : (
+                  <div className="flex items-center gap-2">
 
-                      <span
-                        onClick={() =>
-                          canEditHeader && setEditHeader(col.id)
-                        }
-                        className={canEditHeader ? "cursor-pointer" : ""}
+                    <span
+                      onClick={() =>
+                        canEditHeader && setEditHeader(col.id)
+                      }
+                      className={`truncate ${canEditHeader ? "cursor-pointer hover:text-[#F2B95E]" : ""}`}
+                    >
+                      {col.name}
+                    </span>
+
+                    {canDelete && (
+                      <button
+                        onClick={() => deleteColumn(col)}
+                        className="text-red-400 hover:text-red-500 text-xs"
                       >
-                        {col.name}
-                      </span>
+                        ✕
+                      </button>
+                    )}
 
-                      {canDelete && (
-                        <button
-                          onClick={() => deleteColumn(col)}
-                          className="text-red-500 hover:text-red-700 text-xs"
-                        >
-                          ✕
-                        </button>
-                      )}
+                  </div>
+                )}
 
-                    </div>
-                  )}
+              </th>
+            ))}
+            <th className="px-2"></th>
+          </tr>
+        </thead>
 
-                </th>
-              ))}
-            </tr>
-          </thead>
+        {/* BODY */}
+        <tbody>
+          {filtered.map((row) => (
+            <tr
+              key={row.id}
+              className="bg-[#2A1458]/60 hover:bg-[#52366B]/40 transition rounded-xl"
+            >
+              {columns.map((col) => {
+                const value = getValue(row, col.name);
+                const isEditing =
+                  editCell === `${row.id}-${col.name}`;
 
-          {/* BODY */}
-          <tbody>
-            {filtered.map((row) => (
-              <tr key={row.id} className="bg-white shadow-sm rounded-xl hover:shadow-md transition">
-                {columns.map((col) => {
-                  const value = getValue(row, col.name);
-                  const isEditing =
-                    editCell === `${row.id}-${col.name}`;
+                return (
+                  <td key={col.id} className="px-3 py-2 text-white whitespace-nowrap">
 
-                  return (
-                    <td key={col.id} className="px-3 py-2">
-
-                      {isEditing ? (
-                        <input
-                          autoFocus
-                          defaultValue={value}
-                          onBlur={(e) => {
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        defaultValue={value}
+                        onBlur={(e) => {
+                          updateCell(row, col.name, e.target.value);
+                          setEditCell(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
                             updateCell(row, col.name, e.target.value);
                             setEditCell(null);
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              updateCell(row, col.name, e.target.value);
-                              setEditCell(null);
-                            }
-                          }}
-                          className="border px-2 py-1 rounded w-full"
-                        />
-                      ) : (
-                        <div
-                          onClick={() =>
-                            canEditCell &&
-                            setEditCell(`${row.id}-${col.name}`)
                           }
-                          className={canEditCell ? "cursor-pointer hover:bg-gray-50 rounded px-1" : ""}
-                        >
-                          <span className={value ? "" : "text-gray-400 italic"}>
-                            {value || "Empty"}
-                          </span>
-                        </div>
-                      )}
+                        }}
+                        className="bg-white/10 border border-white/20 text-white px-2 py-1 rounded w-full"
+                      />
+                    ) : (
+                      <div
+                        onClick={() =>
+                          canEditCell &&
+                          setEditCell(`${row.id}-${col.name}`)
+                        }
+                        className={`px-1 rounded ${
+                          canEditCell ? "cursor-pointer hover:bg-white/10" : ""
+                        }`}
+                      >
+                        <span className={value ? "" : "text-white/40 italic"}>
+                          {value || "Empty"}
+                        </span>
+                      </div>
+                    )}
 
-                    </td>
-                  );
-                })}
-                <td className="px-2 text-center">
-                  {canDelete && (
-                    <button
-                      onClick={() => deleteRow(row.id)}
-                      className="text-red-500 hover:text-red-700 text-sm"
-                    >
-                      🗑
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
+                  </td>
+                );
+              })}
 
-        </table>
-      </div>
+              {/* DELETE */}
+              <td className="px-2 text-center">
+                {canDelete && (
+                  <button
+                    onClick={() => deleteRow(row.id)}
+                    className="text-red-400 hover:text-red-500 text-sm"
+                  >
+                    🗑
+                  </button>
+                )}
+              </td>
+
+            </tr>
+          ))}
+        </tbody>
+
+      </table>
+
     </div>
-  );
+  </div>
+);
 }
