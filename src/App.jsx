@@ -7,7 +7,6 @@ import Dashboard from "./pages/Dashboard";
 import Sheets from "./pages/Sheets";
 import Admin from "./pages/Admin";
 import Logs from "./pages/Logs";
-import AddRecord from "./pages/AddRecord";
 
 import Layout from "./components/Layout";
 
