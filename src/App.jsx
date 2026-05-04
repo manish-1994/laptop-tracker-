@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Sheets from "./pages/Sheets";
 import Admin from "./pages/Admin";
 import Logs from "./pages/Logs";
+import AddRecord from "./pages/AddRecord";
 
 import Layout from "./components/Layout";
 
@@ -40,6 +41,8 @@ export default function App() {
 
         {/* SHEETS */}
         <Route path="/sheets" element={<Sheets />} />
+
+
 
         {user.role === "super_admin" && (
           <Route path="/sheets" element={<Sheets />} />
