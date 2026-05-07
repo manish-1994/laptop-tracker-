@@ -39,7 +39,8 @@ export default function RecordEditor() {
     const { data: cols } = await supabase
       .from("columns")
       .select("*")
-      .eq("sheet_id", selectedSheet);
+      .eq("sheet_id", selectedSheet)
+      .order("position", { ascending: true });
 
     const { data: rowsData } = await supabase
       .from("rows")

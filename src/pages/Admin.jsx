@@ -90,7 +90,8 @@ export default function Admin() {
     const { data } = await supabase
       .from("columns")
       .select("*")
-      .eq("sheet_id", sheetId);
+      .eq("sheet_id", sheetId)
+      .order("position", { ascending: true });
 
     setColumns(data || []);
   };
@@ -753,21 +754,21 @@ export default function Admin() {
 
         <div className="flex gap-4 mt-5">
 
-  <button
-    onClick={saveConfig}
-    className="btn-primary"
-  >
-    Save Chart Config
-  </button>
+          <button
+            onClick={saveConfig}
+            className="btn-primary"
+          >
+            Save Chart Config
+          </button>
 
-  <button
-    onClick={deleteChartConfig}
-    className="btn-danger"
-  >
-    Delete Chart Config
-  </button>
+          <button
+            onClick={deleteChartConfig}
+            className="btn-danger"
+          >
+            Delete Chart Config
+          </button>
 
-</div>
+        </div>
       </div>
 
       {/* DELETE */}

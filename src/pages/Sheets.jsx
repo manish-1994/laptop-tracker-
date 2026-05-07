@@ -31,99 +31,101 @@ export default function Sheets() {
     const { data: colData } = await supabase
       .from("columns")
       .select("*")
-      .eq("sheet_id", sheetId);
+      .eq("sheet_id", sheetId)
+      .order("position", { ascending: true });
 
     setRows(rowsData || []);
     setColumns(colData || []);
   };
 
   // ➕ ADD ROW (SAFE)
-const addRow = async () => {
-  if (!selectedSheetId) {
-    console.error("❌ No sheet selected");
-    return;
-  }
+  const addRow = async () => {
+    if (!selectedSheetId) {
+      console.error("❌ No sheet selected");
+      return;
+    }
 
-  // create empty row based on current columns
-  const emptyData = {};
-  columns.forEach((col) => {
-    emptyData[col.name] = "";
-  });
+    // create empty row based on current columns
+    const emptyData = {};
+    columns.forEach((col) => {
+      emptyData[col.name] = "";
+    });
 
-  const { error } = await supabase.from("rows").insert({
-    sheet_id: selectedSheetId,
-    data: emptyData,
-  });
+    const { error } = await supabase.from("rows").insert({
+      sheet_id: selectedSheetId,
+      data: emptyData,
+    });
 
-  if (error) {
-    console.error("❌ Add row failed:", error);
-    alert("Failed to add row");
-    return;
-  }
+    if (error) {
+      console.error("❌ Add row failed:", error);
+      alert("Failed to add row");
+      return;
+    }
 
-  console.log("✅ Row added");
+    console.log("✅ Row added");
 
-  // 🔄 reload table
-  load(selectedSheetId);
-};
+    // 🔄 reload table
+    load(selectedSheetId);
+  };
 
-// ➕ ADD COLUMN (SAFE)
-const addColumn = async () => {
-  if (!selectedSheetId) {
-    console.error("❌ No sheet selected");
-    return;
-  }
+  // ➕ ADD COLUMN (SAFE)
+  const addColumn = async () => {
+    if (!selectedSheetId) {
+      console.error("❌ No sheet selected");
+      return;
+    }
 
-  const name = prompt("Enter column name");
-  if (!name || !name.trim()) return;
+    const name = prompt("Enter column name");
+    if (!name || !name.trim()) return;
 
-  // 🚫 prevent duplicates
-  const exists = columns.some(
-    (c) => c.name.trim().toLowerCase() === name.trim().toLowerCase()
-  );
+    // 🚫 prevent duplicates
+    const exists = columns.some(
+      (c) => c.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
 
-  if (exists) {
-    alert("Column already exists");
-    return;
-  }
+    if (exists) {
+      alert("Column already exists");
+      return;
+    }
 
-  // 1️⃣ INSERT COLUMN
-  const { error: colError } = await supabase.from("columns").insert({
-    sheet_id: selectedSheetId,
-    name: name.trim(),
-  });
+    // 1️⃣ INSERT COLUMN
+    const { error: colError } = await supabase.from("columns").insert({
+      sheet_id: selectedSheetId,
+      name: name.trim(),
+      position: columns.length,
+    });
 
-  if (colError) {
-    console.error("❌ Column insert failed:", colError);
-    alert("Failed to add column");
-    return;
-  }
+    if (colError) {
+      console.error("❌ Column insert failed:", colError);
+      alert("Failed to add column");
+      return;
+    }
 
-  // 2️⃣ UPDATE ALL ROWS (add new key)
-  const { data: rowsData, error: rowsError } = await supabase
-    .from("rows")
-    .select("*")
-    .eq("sheet_id", selectedSheetId);
-
-  if (rowsError) {
-    console.error("❌ Fetch rows failed:", rowsError);
-    return;
-  }
-
-  for (const row of rowsData || []) {
-    await supabase
+    // 2️⃣ UPDATE ALL ROWS (add new key)
+    const { data: rowsData, error: rowsError } = await supabase
       .from("rows")
-      .update({
-        data: { ...row.data, [name.trim()]: "" },
-      })
-      .eq("id", row.id);
-  }
+      .select("*")
+      .eq("sheet_id", selectedSheetId);
 
-  console.log("✅ Column added");
+    if (rowsError) {
+      console.error("❌ Fetch rows failed:", rowsError);
+      return;
+    }
 
-  // 🔄 reload
-  load(selectedSheetId);
-};
+    for (const row of rowsData || []) {
+      await supabase
+        .from("rows")
+        .update({
+          data: { ...row.data, [name.trim()]: "" },
+        })
+        .eq("id", row.id);
+    }
+
+    console.log("✅ Column added");
+
+    // 🔄 reload
+    load(selectedSheetId);
+  };
 
   // 🔥 SINGLE SOURCE OF TRUTH (COLUMN RENAME)
   const updateColumnName = async (columnId, oldName, newName) => {
@@ -160,12 +162,19 @@ const addColumn = async () => {
       );
 
       if (oldKey !== undefined) {
-        updated[newName] = updated[oldKey];
-        delete updated[oldKey];
+        const rebuilt = {};
+
+        Object.keys(updated).forEach((key) => {
+          if (key === oldKey) {
+            rebuilt[newName] = updated[key];
+          } else {
+            rebuilt[key] = updated[key];
+          }
+        });
 
         await supabase
           .from("rows")
-          .update({ data: updated })
+          .update({ data: rebuilt })
           .eq("id", row.id);
       }
     }
@@ -182,115 +191,115 @@ const addColumn = async () => {
     // 5️⃣ RELOAD
     await load(selectedSheetId);
 
-// 🔥 FORCE UI RESET (VERY IMPORTANT)
-setTimeout(() => {
-  setRows([]);
-  setColumns([]);
-  load(selectedSheetId);
-}, 50);
+    // 🔥 FORCE UI RESET (VERY IMPORTANT)
+    setTimeout(() => {
+      setRows([]);
+      setColumns([]);
+      load(selectedSheetId);
+    }, 50);
   };
 
 
 
   // 🔥 ADD COLUMN
- 
+
 
   return (
-  <div className="p-6 space-y-6 text-white">
+    <div className="p-6 space-y-6 text-white">
 
-    {/* HEADER */}
-    <h1 className="title">
-      Sheets
-    </h1>
+      {/* HEADER */}
+      <h1 className="title">
+        Sheets
+      </h1>
 
-    {/* SHEETS TABS */}
-    <div className="glass p-4">
-      <SheetTabs
-        onSelect={(id) => {
-          setSelectedSheetId(id);
-          load(id);
-        }}
-      />
-    </div>
-
-    {/* ACTION BAR */}
-    <div className="glass p-4 flex gap-3 items-center flex-wrap">
-
-      {/* IMPORT */}
-      <label className="btn-primary cursor-pointer">
-        Import Workbook
-        <input
-          type="file"
-          hidden
-          onChange={(e) => importExcel(e.target.files[0])}
+      {/* SHEETS TABS */}
+      <div className="glass p-4">
+        <SheetTabs
+          onSelect={(id) => {
+            setSelectedSheetId(id);
+            load(id);
+          }}
         />
-      </label>
+      </div>
 
-      {/* INPUT */}
-      <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder='{"name":"Laptop"}'
-        className="input flex-1 min-w-[250px]"
-      />
+      {/* ACTION BAR */}
+      <div className="glass p-4 flex gap-3 items-center flex-wrap">
 
-      {/* ADD ROW */}
-      <button
-        onClick={addRow}
-        className="btn-primary"
-      >
-        + Row
-      </button>
+        {/* IMPORT */}
+        <label className="btn-primary cursor-pointer">
+          Import Workbook
+          <input
+            type="file"
+            hidden
+            onChange={(e) => importExcel(e.target.files[0])}
+          />
+        </label>
 
-      {/* ADD COLUMN */}
-      {(role === "admin" || role === "super_admin") && (
+        {/* INPUT */}
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder='{"name":"Laptop"}'
+          className="input flex-1 min-w-[250px]"
+        />
+
+        {/* ADD ROW */}
         <button
-          onClick={addColumn}
+          onClick={addRow}
           className="btn-primary"
         >
-          + Column
+          + Row
         </button>
+
+        {/* ADD COLUMN */}
+        {(role === "admin" || role === "super_admin") && (
+          <button
+            onClick={addColumn}
+            className="btn-primary"
+          >
+            + Column
+          </button>
+        )}
+
+      </div>
+
+      {/* EMPTY STATE */}
+      {columns.length === 0 && (
+        <div className="glass p-12 text-center">
+
+          <div className="text-4xl mb-3">📄</div>
+
+          <p className="text-white/80 text-lg">
+            No columns found for this sheet
+          </p>
+
+          <p className="text-sm text-white/50 mt-2">
+            Start by adding a column or importing a workbook
+          </p>
+
+        </div>
+      )}
+
+      {/* TABLE */}
+      {columns.length > 0 && (
+        <div className="glass p-4">
+
+          {/* 🔥 IMPORTANT WRAPPER FIX */}
+          <div className="rounded-xl overflow-auto bg-[#2A1458]/40 border border-white/10">
+
+            <TableView
+              rows={rows}
+              columns={columns}
+              refresh={() => load(selectedSheetId)}
+              sheetId={selectedSheetId}
+              onColumnRename={updateColumnName}
+            />
+
+          </div>
+
+        </div>
       )}
 
     </div>
-
-    {/* EMPTY STATE */}
-    {columns.length === 0 && (
-      <div className="glass p-12 text-center">
-
-        <div className="text-4xl mb-3">📄</div>
-
-        <p className="text-white/80 text-lg">
-          No columns found for this sheet
-        </p>
-
-        <p className="text-sm text-white/50 mt-2">
-          Start by adding a column or importing a workbook
-        </p>
-
-      </div>
-    )}
-
-    {/* TABLE */}
-    {columns.length > 0 && (
-      <div className="glass p-4">
-
-        {/* 🔥 IMPORTANT WRAPPER FIX */}
-        <div className="rounded-xl overflow-auto bg-[#2A1458]/40 border border-white/10">
-
-          <TableView
-            rows={rows}
-            columns={columns}
-            refresh={() => load(selectedSheetId)}
-            sheetId={selectedSheetId}
-            onColumnRename={updateColumnName}
-          />
-
-        </div>
-
-      </div>
-    )}
-
-  </div>
-);
+  );
 }

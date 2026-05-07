@@ -61,11 +61,12 @@ export const importExcel = async (file) => {
       const sheetId = newSheet.id;
 
       // 🔥 INSERT COLUMNS
-      const columns = headers.map((h) => ({
-        sheet_id: sheetId,
-        name: h,
-        type: "text",
-      }));
+      const columns = headers.map((h, index) => ({
+  sheet_id: sheetId,
+  name: h,
+  type: "text",
+  position: index,
+}));
 
       const { error: colError } = await supabase
         .from("columns")
