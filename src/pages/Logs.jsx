@@ -144,7 +144,7 @@ export default function Logs() {
             <div
               key={log.id}
               className="relative pl-6"
-              onClick={() => toast.success("Log opened 📜")}
+              
             >
 
               {/* TIMELINE DOT */}
