@@ -129,6 +129,71 @@ export default function Admin() {
     toast.success("Config saved ✅");
   };
 
+  const deleteChartConfig = async () => {
+
+    if (!selectedSheet) {
+      toast.error("Select a sheet first ❌");
+      return;
+    }
+
+    const confirmed = await new Promise((resolve) => {
+
+      toast((t) => (
+        <div className="flex flex-col gap-3">
+
+          <span className="text-sm">
+            Delete chart configuration?
+          </span>
+
+          <div className="flex justify-end gap-2">
+
+            <button
+              className="px-3 py-1 rounded bg-white/10 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                toast("Delete cancelled");
+                resolve(false);
+              }}
+            >
+              Cancel
+            </button>
+
+            <button
+              className="px-3 py-1 rounded bg-red-500 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                resolve(true);
+              }}
+            >
+              Delete
+            </button>
+
+          </div>
+        </div>
+      ));
+
+    });
+
+    if (!confirmed) return;
+
+    const t = toast.loading("Deleting config...");
+
+    const { error } = await supabase
+      .from("dashboard_config")
+      .delete()
+      .eq("sheet_id", selectedSheet);
+
+    if (error) {
+      toast.error("Failed to delete config ❌", { id: t });
+      return;
+    }
+
+    toast.success("Chart config deleted 🗑", { id: t });
+
+    setSelectedColumn("");
+    setChartType("pie");
+  };
+
   // --------------------------
   // ✅ CREATE USER (FIXED)
   // --------------------------
@@ -190,100 +255,100 @@ export default function Admin() {
 
 
   const deleteUser = async (id) => {
-  return new Promise((resolve) => {
+    return new Promise((resolve) => {
 
-    toast((t) => (
-      <div className="flex flex-col gap-3">
+      toast((t) => (
+        <div className="flex flex-col gap-3">
 
-        <span className="text-sm">
-          Delete user permanently?
-        </span>
+          <span className="text-sm">
+            Delete user permanently?
+          </span>
 
-        <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2">
 
-          <button
-            className="px-3 py-1 rounded bg-white/10 text-white"
-            onClick={() => {
-              toast.dismiss(t.id);
-              toast("Delete cancelled");
-              resolve(false);
-            }}
-          >
-            Cancel
-          </button>
-
-          <button
-            className="px-3 py-1 rounded bg-red-500 text-white"
-            onClick={async () => {
-
-              toast.dismiss(t.id);
-
-              const loadingToast = toast.loading("Deleting user...");
-
-              const { data } = await supabase.auth.getUser();
-
-              if (data?.user?.id === id) {
-                toast.error("❌ You cannot delete yourself", {
-                  id: loadingToast,
-                });
+            <button
+              className="px-3 py-1 rounded bg-white/10 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                toast("Delete cancelled");
                 resolve(false);
-                return;
-              }
+              }}
+            >
+              Cancel
+            </button>
 
-              try {
-                const session = await supabase.auth.getSession();
+            <button
+              className="px-3 py-1 rounded bg-red-500 text-white"
+              onClick={async () => {
 
-                const res = await fetch(
-                  "https://kxzouwsqngkngkcxhojg.supabase.co/functions/v1/manage-users",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${session.data.session?.access_token}`,
-                    },
-                    body: JSON.stringify({
-                      action: "delete",
-                      userId: id,
-                    }),
-                  }
-                );
+                toast.dismiss(t.id);
 
-                const result = await res.json();
+                const loadingToast = toast.loading("Deleting user...");
 
-                if (!res.ok || result.error) {
-                  toast.error("Delete failed ❌", {
+                const { data } = await supabase.auth.getUser();
+
+                if (data?.user?.id === id) {
+                  toast.error("❌ You cannot delete yourself", {
                     id: loadingToast,
                   });
                   resolve(false);
                   return;
                 }
 
-                toast.success("User deleted 🗑", {
-                  id: loadingToast,
-                });
+                try {
+                  const session = await supabase.auth.getSession();
 
-                loadUsers();
+                  const res = await fetch(
+                    "https://kxzouwsqngkngkcxhojg.supabase.co/functions/v1/manage-users",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${session.data.session?.access_token}`,
+                      },
+                      body: JSON.stringify({
+                        action: "delete",
+                        userId: id,
+                      }),
+                    }
+                  );
 
-                resolve(true);
+                  const result = await res.json();
 
-              } catch (err) {
-                toast.error("❌ " + err.message, {
-                  id: loadingToast,
-                });
+                  if (!res.ok || result.error) {
+                    toast.error("Delete failed ❌", {
+                      id: loadingToast,
+                    });
+                    resolve(false);
+                    return;
+                  }
 
-                resolve(false);
-              }
-            }}
-          >
-            Delete
-          </button>
+                  toast.success("User deleted 🗑", {
+                    id: loadingToast,
+                  });
 
+                  loadUsers();
+
+                  resolve(true);
+
+                } catch (err) {
+                  toast.error("❌ " + err.message, {
+                    id: loadingToast,
+                  });
+
+                  resolve(false);
+                }
+              }}
+            >
+              Delete
+            </button>
+
+          </div>
         </div>
-      </div>
-    ));
+      ));
 
-  });
-};
+    });
+  };
 
 
   const updateRole = async (id, role) => {
@@ -342,154 +407,154 @@ export default function Admin() {
 
   const deleteAll = async () => {
 
-  const confirmed = await new Promise((resolve) => {
+    const confirmed = await new Promise((resolve) => {
 
-    toast((t) => (
-      <div className="flex flex-col gap-3">
+      toast((t) => (
+        <div className="flex flex-col gap-3">
 
-        <span className="text-sm">
-          Delete EVERYTHING?
-        </span>
+          <span className="text-sm">
+            Delete EVERYTHING?
+          </span>
 
-        <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2">
 
-          <button
-            className="px-3 py-1 rounded bg-white/10 text-white"
-            onClick={() => {
-              toast.dismiss(t.id);
-              toast("Delete cancelled");
-              resolve(false);
-            }}
-          >
-            Cancel
-          </button>
+            <button
+              className="px-3 py-1 rounded bg-white/10 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                toast("Delete cancelled");
+                resolve(false);
+              }}
+            >
+              Cancel
+            </button>
 
-          <button
-            className="px-3 py-1 rounded bg-red-500 text-white"
-            onClick={() => {
-              toast.dismiss(t.id);
-              resolve(true);
-            }}
-          >
-            Delete
-          </button>
+            <button
+              className="px-3 py-1 rounded bg-red-500 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                resolve(true);
+              }}
+            >
+              Delete
+            </button>
 
+          </div>
         </div>
-      </div>
-    ));
+      ));
 
-  });
+    });
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  const t = toast.loading("Starting full deletion...");
+    const t = toast.loading("Starting full deletion...");
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const updateToast = (msg) => {
-      setProgress(msg);
-      toast.loading(msg, { id: t });
-    };
+      const updateToast = (msg) => {
+        setProgress(msg);
+        toast.loading(msg, { id: t });
+      };
 
-    await deleteTableInBatches("rows", updateToast);
-    await deleteTableInBatches("columns", updateToast);
-    await deleteTableInBatches("dashboard_config", updateToast);
-    await deleteTableInBatches("sheets", updateToast);
-    await deleteTableInBatches("logs", updateToast);
-    await deleteTableInBatches("assets", updateToast);
+      await deleteTableInBatches("rows", updateToast);
+      await deleteTableInBatches("columns", updateToast);
+      await deleteTableInBatches("dashboard_config", updateToast);
+      await deleteTableInBatches("sheets", updateToast);
+      await deleteTableInBatches("logs", updateToast);
+      await deleteTableInBatches("assets", updateToast);
 
-    setLoading(false);
-    setProgress("");
+      setLoading(false);
+      setProgress("");
 
-    toast.success("All data deleted ⚠️", { id: t });
+      toast.success("All data deleted ⚠️", { id: t });
 
-    fetchSheets();
-    loadDbSize();
+      fetchSheets();
+      loadDbSize();
 
-  } catch (err) {
-    toast.error("Delete failed ❌", { id: t });
-  }
-};
+    } catch (err) {
+      toast.error("Delete failed ❌", { id: t });
+    }
+  };
 
   const deleteSelectedSheet = async () => {
 
-  if (!selectedSheet) {
-    toast.error("Select a sheet first ❌");
-    return;
-  }
+    if (!selectedSheet) {
+      toast.error("Select a sheet first ❌");
+      return;
+    }
 
-  const confirmed = await new Promise((resolve) => {
+    const confirmed = await new Promise((resolve) => {
 
-    toast((t) => (
-      <div className="flex flex-col gap-3">
+      toast((t) => (
+        <div className="flex flex-col gap-3">
 
-        <span className="text-sm">
-          Delete this sheet?
-        </span>
+          <span className="text-sm">
+            Delete this sheet?
+          </span>
 
-        <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2">
 
-          <button
-            className="px-3 py-1 rounded bg-white/10 text-white"
-            onClick={() => {
-              toast.dismiss(t.id);
-              toast("Delete cancelled");
-              resolve(false);
-            }}
-          >
-            Cancel
-          </button>
+            <button
+              className="px-3 py-1 rounded bg-white/10 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                toast("Delete cancelled");
+                resolve(false);
+              }}
+            >
+              Cancel
+            </button>
 
-          <button
-            className="px-3 py-1 rounded bg-red-500 text-white"
-            onClick={() => {
-              toast.dismiss(t.id);
-              resolve(true);
-            }}
-          >
-            Delete
-          </button>
+            <button
+              className="px-3 py-1 rounded bg-red-500 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                resolve(true);
+              }}
+            >
+              Delete
+            </button>
 
+          </div>
         </div>
-      </div>
-    ));
+      ));
 
-  });
+    });
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  const t = toast.loading("Deleting sheet...");
+    const t = toast.loading("Deleting sheet...");
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    await supabase
-      .from("rows")
-      .delete()
-      .eq("sheet_id", selectedSheet);
+      await supabase
+        .from("rows")
+        .delete()
+        .eq("sheet_id", selectedSheet);
 
-    await supabase
-      .from("columns")
-      .delete()
-      .eq("sheet_id", selectedSheet);
+      await supabase
+        .from("columns")
+        .delete()
+        .eq("sheet_id", selectedSheet);
 
-    await supabase
-      .from("sheets")
-      .delete()
-      .eq("id", selectedSheet);
+      await supabase
+        .from("sheets")
+        .delete()
+        .eq("id", selectedSheet);
 
-    setLoading(false);
+      setLoading(false);
 
-    toast.success("Sheet deleted 🗑", { id: t });
+      toast.success("Sheet deleted 🗑", { id: t });
 
-    fetchSheets();
-    loadDbSize();
+      fetchSheets();
+      loadDbSize();
 
-  } catch (err) {
-    toast.error("Delete failed ❌", { id: t });
-  }
-};
+    } catch (err) {
+      toast.error("Delete failed ❌", { id: t });
+    }
+  };
 
   // --------------------------
   // ACCESS CONTROL
@@ -686,12 +751,23 @@ export default function Admin() {
           </select>
         </div>
 
-        <button
-          onClick={saveConfig}
-          className="mt-5 btn-primary"
-        >
-          Save Chart Config
-        </button>
+        <div className="flex gap-4 mt-5">
+
+  <button
+    onClick={saveConfig}
+    className="btn-primary"
+  >
+    Save Chart Config
+  </button>
+
+  <button
+    onClick={deleteChartConfig}
+    className="btn-danger"
+  >
+    Delete Chart Config
+  </button>
+
+</div>
       </div>
 
       {/* DELETE */}
