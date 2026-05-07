@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 
 export default function RecordEditor() {
@@ -121,70 +123,168 @@ export default function RecordEditor() {
     return true;
   };
 
+
+  const exportToExcel = () => {
+
+    if (!rows.length) {
+      toast.error("No data to export ❌");
+      return;
+    }
+
+    // 🔥 CLEAN DATA
+    const exportData = rows.map((row) => row.data);
+
+    // ✅ CREATE WORKSHEET
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+    // ✅ CREATE WORKBOOK
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Records"
+    );
+
+    // ✅ GENERATE EXCEL BUFFER
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    // ✅ CREATE FILE
+    const fileData = new Blob(
+      [excelBuffer],
+      {
+        type:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      }
+    );
+
+    // ✅ SAVE FILE
+    saveAs(
+      fileData,
+      `${selectedSheet || "records"}.xlsx`
+    );
+
+    toast.success("Excel exported ✅");
+  };
+
+  const exportFullWorkbook = async () => {
+
+    if (!sheets.length) {
+      toast.error("No sheets found ❌");
+      return;
+    }
+
+    const workbook = XLSX.utils.book_new();
+
+    for (const sheet of sheets) {
+
+      // ✅ GET ROWS FOR SHEET
+      const { data: sheetRows } = await supabase
+        .from("rows")
+        .select("*")
+        .eq("sheet_id", sheet.id);
+
+      const exportData = (sheetRows || []).map(
+        (row) => row.data
+      );
+
+      // ✅ CREATE WORKSHEET
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+      // ✅ ADD TAB
+      XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        sheet.name.substring(0, 31) // Excel limit
+      );
+    }
+
+    // ✅ GENERATE FILE
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const fileData = new Blob(
+      [excelBuffer],
+      {
+        type:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      }
+    );
+
+    saveAs(fileData, "Full_Workbook.xlsx");
+
+    toast.success("Full workbook exported ✅");
+  };
+
   const deleteRow = async () => {
-  return new Promise((resolve) => {
+    return new Promise((resolve) => {
 
-    toast((t) => (
-      <div className="flex flex-col gap-3">
+      toast((t) => (
+        <div className="flex flex-col gap-3">
 
-        <span className="text-sm">
-          Delete this record?
-        </span>
+          <span className="text-sm">
+            Delete this record?
+          </span>
 
-        <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2">
 
-          <button
-            className="px-3 py-1 rounded bg-white/10 text-white"
-            onClick={() => {
-              toast.dismiss(t.id);
-              toast("Delete cancelled");
-              resolve(false);
-            }}
-          >
-            Cancel
-          </button>
-
-          <button
-            className="px-3 py-1 rounded bg-red-500 text-white"
-            onClick={async () => {
-
-              toast.dismiss(t.id);
-
-              const { error } = await supabase
-                .from("rows")
-                .delete()
-                .eq("id", selectedRow.id);
-
-              if (error) {
-                toast.error("Delete failed ❌");
+            <button
+              className="px-3 py-1 rounded bg-white/10 text-white"
+              onClick={() => {
+                toast.dismiss(t.id);
+                toast("Delete cancelled");
                 resolve(false);
-                return;
-              }
+              }}
+            >
+              Cancel
+            </button>
 
-              setSelectedRow(null);
-              loadData();
+            <button
+              className="px-3 py-1 rounded bg-red-500 text-white"
+              onClick={async () => {
 
-              await supabase.from("logs").insert({
-                user_name: profile?.username || "Unknown",
-                user_role: profile?.role || "user",
-                action_type: "deleted record",
-                description: "Deleted record",
-              });
+                toast.dismiss(t.id);
 
-              toast.success("Record deleted 🗑");
+                const { error } = await supabase
+                  .from("rows")
+                  .delete()
+                  .eq("id", selectedRow.id);
 
-              resolve(true);
-            }}
-          >
-            Delete
-          </button>
+                if (error) {
+                  toast.error("Delete failed ❌");
+                  resolve(false);
+                  return;
+                }
 
+                setSelectedRow(null);
+                loadData();
+
+                await supabase.from("logs").insert({
+                  user_name: profile?.username || "Unknown",
+                  user_role: profile?.role || "user",
+                  action_type: "deleted record",
+                  description: "Deleted record",
+                });
+
+                toast.success("Record deleted 🗑");
+
+                resolve(true);
+              }}
+            >
+              Delete
+            </button>
+
+          </div>
         </div>
-      </div>
-    ));
+      ));
 
-  });
-};
+    });
+  };
 
   return (
     <>
@@ -202,6 +302,20 @@ export default function RecordEditor() {
 
           {/* CONTROLS */}
           <div className="flex gap-4 flex-wrap">
+
+            <button
+              onClick={exportFullWorkbook}
+              className="px-4 py-2 rounded-xl bg-emerald-600 text-white shadow hover:scale-105 transition"
+            >
+              Export Full Workbook
+            </button>
+
+            <button
+              onClick={exportToExcel}
+              className="px-4 py-2 rounded-xl bg-green-600 text-white shadow hover:scale-105 transition"
+            >
+              Export Excel
+            </button>
 
             <button
               onClick={() => {
@@ -372,11 +486,11 @@ export default function RecordEditor() {
             </div>
 
             <button
-  onClick={deleteRow}
-  className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-2 rounded-xl shadow hover:scale-105 transition mt-6"
->
-  Delete Record
-</button>
+              onClick={deleteRow}
+              className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-2 rounded-xl shadow hover:scale-105 transition mt-6"
+            >
+              Delete Record
+            </button>
 
           </div>
         )}
@@ -428,22 +542,22 @@ export default function RecordEditor() {
                 Cancel
               </button>
 
-             <button
-  onClick={async () => {
-    const t = toast.loading("Saving record...");
+              <button
+                onClick={async () => {
+                  const t = toast.loading("Saving record...");
 
-    const success = await addRecord();
+                  const success = await addRecord();
 
-    toast.dismiss(t);
+                  toast.dismiss(t);
 
-    if (success) {
-      toast.success("Record saved ✅");
-    }
-  }}
-  className="px-4 py-2 bg-gradient-to-r from-[#FF653F] to-[#F2B95E] text-white rounded-lg shadow hover:scale-105 transition"
->
-  Save
-</button>
+                  if (success) {
+                    toast.success("Record saved ✅");
+                  }
+                }}
+                className="px-4 py-2 bg-gradient-to-r from-[#FF653F] to-[#F2B95E] text-white rounded-lg shadow hover:scale-105 transition"
+              >
+                Save
+              </button>
 
             </div>
 
