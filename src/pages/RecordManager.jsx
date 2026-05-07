@@ -75,7 +75,7 @@ export default function RecordManager() {
     loadData();
   };
 
- return (
+return (
   <div className="p-6 text-white">
 
     <div className="bg-[#2A1458]/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-6 space-y-6">
@@ -94,34 +94,40 @@ export default function RecordManager() {
       <div className="flex gap-4 flex-wrap">
 
         <select
-  value={selectedSheet}
-  onChange={(e) => setSelectedSheet(e.target.value)}
-  className="
-    px-4 py-2 rounded-xl
-    bg-[#2A1458]/70 text-white
-    border border-white/20
-    backdrop-blur-xl
-    shadow-md
-    focus:ring-2 focus:ring-[#FF653F]
-    outline-none
-    appearance-none
-    cursor-pointer
-  "
->
-  <option value="" className="bg-[#2A1458] text-white">
-    Select Sheet
-  </option>
+          value={selectedSheet}
+          onChange={(e) => {
+            setSelectedSheet(e.target.value);
 
-  {sheets.map((s) => (
-    <option
-      key={s.id}
-      value={s.id}
-      className="bg-[#2A1458] text-white"
-    >
-      {s.name}
-    </option>
-  ))}
-</select>
+            if (e.target.value) {
+              toast.success("Sheet selected ✅");
+            }
+          }}
+          className="
+            px-4 py-2 rounded-xl
+            bg-[#2A1458]/70 text-white
+            border border-white/20
+            backdrop-blur-xl
+            shadow-md
+            focus:ring-2 focus:ring-[#FF653F]
+            outline-none
+            appearance-none
+            cursor-pointer
+          "
+        >
+          <option value="" className="bg-[#2A1458] text-white">
+            Select Sheet
+          </option>
+
+          {sheets.map((s) => (
+            <option
+              key={s.id}
+              value={s.id}
+              className="bg-[#2A1458] text-white"
+            >
+              {s.name}
+            </option>
+          ))}
+        </select>
 
         <input
           placeholder="Search records..."
@@ -148,7 +154,9 @@ export default function RecordManager() {
                   {col.name}
                 </th>
               ))}
-              <th className="px-4 py-3 text-xs uppercase text-white/80">Actions</th>
+              <th className="px-4 py-3 text-xs uppercase text-white/80">
+                Actions
+              </th>
             </tr>
           </thead>
 
@@ -178,7 +186,13 @@ export default function RecordManager() {
                         className="w-full px-2 py-1 rounded bg-white/10 border border-white/20 text-white"
                       />
                     ) : (
-                      <span className={!row.data[col.name] ? "text-white/40 italic" : ""}>
+                      <span
+                        className={
+                          !row.data[col.name]
+                            ? "text-white/40 italic"
+                            : ""
+                        }
+                      >
                         {row.data[col.name] || "Empty"}
                       </span>
                     )}
@@ -191,14 +205,20 @@ export default function RecordManager() {
                   {editingRow === row.id ? (
                     <>
                       <button
-                        onClick={() => saveEdit(row.id)}
+                        onClick={() => {
+                          toast.loading("Saving changes...");
+                          saveEdit(row.id);
+                        }}
                         className="px-3 py-1 rounded-lg bg-green-500/20 text-green-300 hover:bg-green-500 hover:text-white transition"
                       >
                         Save
                       </button>
 
                       <button
-                        onClick={() => setEditingRow(null)}
+                        onClick={() => {
+                          setEditingRow(null);
+                          toast("Edit cancelled");
+                        }}
                         className="px-3 py-1 rounded-lg bg-white/10 text-white/70 hover:bg-white/20 transition"
                       >
                         Cancel
@@ -207,14 +227,20 @@ export default function RecordManager() {
                   ) : (
                     <>
                       <button
-                        onClick={() => startEdit(row)}
+                        onClick={() => {
+                          startEdit(row);
+                          toast.success("Edit mode enabled ✏️");
+                        }}
                         className="px-3 py-1 rounded-lg bg-[#FF653F]/20 text-[#FF653F] hover:bg-[#FF653F] hover:text-white transition"
                       >
                         Edit
                       </button>
 
                       <button
-                        onClick={() => deleteRow(row.id)}
+                        onClick={() => {
+                          toast.loading("Deleting record...");
+                          deleteRow(row.id);
+                        }}
                         className="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition"
                       >
                         Delete
