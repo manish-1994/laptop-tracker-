@@ -10,11 +10,13 @@ export default function Sheets() {
   const [columns, setColumns] = useState([]);
   const [input, setInput] = useState("");
   const [role, setRole] = useState("viewer");
+  const [profile, setProfile] = useState(null);
   const [selectedSheetId, setSelectedSheetId] = useState(null);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     setRole(user?.role || "viewer");
+    setProfile(user);
   }, []);
 
   // 🔥 LOAD DATA
@@ -181,6 +183,9 @@ export default function Sheets() {
 
     // 4️⃣ LOG
     await supabase.from("logs").insert({
+      user_name: profile?.username || "Unknown",
+      user_role: profile?.role || "user",
+
       action_type: "rename_column",
       column_name: oldName,
       old_value: oldName,
