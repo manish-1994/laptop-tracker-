@@ -3,6 +3,7 @@ import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import BulkPasteModal from "../components/BulkPasteModal";
 
 
 export default function RecordEditor() {
@@ -11,6 +12,7 @@ export default function RecordEditor() {
   const [rows, setRows] = useState([]);
   const [profile, setProfile] = useState(null);
 
+
   const [selectedSheet, setSelectedSheet] = useState("");
   const [search, setSearch] = useState("");
 
@@ -18,6 +20,8 @@ export default function RecordEditor() {
   const [formData, setFormData] = useState({});
   const [showAdd, setShowAdd] = useState(false);
   const [newRecord, setNewRecord] = useState({});
+  const [showBulkPaste, setShowBulkPaste] =
+    useState(false);
 
   useEffect(() => {
     loadSheets();
@@ -122,6 +126,49 @@ export default function RecordEditor() {
     loadData();
 
     return true;
+  };
+
+  const handleBulkSave = async (parsedRows) => {
+
+    try {
+
+      toast.loading("Importing records...", {
+        id: "bulk-save",
+      });
+
+      const rowsToInsert = parsedRows.map((row) => ({
+        sheet_id: selectedSheet,
+        data: row,
+      }));
+
+      const { error } = await supabase
+        .from("rows")
+        .insert(rowsToInsert);
+
+      if (error) throw error;
+
+      toast.success(
+        `${parsedRows.length} records imported successfully ✅`,
+        {
+          id: "bulk-save",
+        }
+      );
+
+      setShowBulkPaste(false);
+
+      loadData();
+
+    } catch (err) {
+
+      console.error(err);
+
+      toast.error(
+        "Failed to import records ❌",
+        {
+          id: "bulk-save",
+        }
+      );
+    }
   };
 
 
@@ -316,6 +363,24 @@ export default function RecordEditor() {
               className="px-4 py-2 rounded-xl bg-green-600 text-white shadow hover:scale-105 transition"
             >
               Export Excel
+            </button>
+
+            <button
+              onClick={() => {
+
+                if (!selectedSheet) {
+                  toast.error("Select a sheet first ❌");
+                  return;
+                }
+
+
+
+                setShowBulkPaste(true);
+              }}
+
+              className="btn-primary"
+            >
+              Bulk Paste
             </button>
 
             <button
@@ -565,7 +630,15 @@ export default function RecordEditor() {
           </div>
         </div>
       )}
+
+      <BulkPasteModal
+        open={showBulkPaste}
+        onClose={() => setShowBulkPaste(false)}
+        columns={columns}
+        onSave={handleBulkSave}
+      />
     </>
+
   );
 
 }
